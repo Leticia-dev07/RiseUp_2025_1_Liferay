@@ -19,16 +19,27 @@
 
 body {
   font-family: "Source Sans Pro", sans-serif;
+<<<<<<< HEAD
   background-color: var(--cor-branco);
   height: 100vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+=======
+  background-color: #fafafb;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+>>>>>>> e583fc70d4f09ebf52234f5ffc70b134c6e9d7b5
 }
 
-/* --- HEADER --- */
+/* --- HEADER (Sem alterações, é global) --- */
 .app-header {
+<<<<<<< HEAD
   grid-column: 1 / -1;
+=======
+>>>>>>> e583fc70d4f09ebf52234f5ffc70b134c6e9d7b5
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -66,6 +77,48 @@ body {
   background: var(--cor-fundo-claro);
   font-size: 16px;
   color: var(--cor-texto-claro);
+<<<<<<< HEAD
+=======
+}
+
+/* Dropdown de busca */
+#global-search-results {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--cor-branco);
+  border: 1px solid var(--cor-borda);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  z-index: 1000;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+#global-search-results a {
+  display: block;
+  padding: 10px 15px;
+  color: var(--cor-texto);
+  text-decoration: none;
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+#global-search-results a:hover {
+  background-color: var(--cor-fundo-claro);
+}
+
+#global-search-results a strong {
+  display: block;
+  font-size: 0.9em;
+}
+
+#global-search-results a span {
+  display: block;
+  font-size: 0.8em;
+  color: #555;
+>>>>>>> e583fc70d4f09ebf52234f5ffc70b134c6e9d7b5
 }
 
 .user-nav {
@@ -121,8 +174,11 @@ body {
 
 /* --- CONTEÚDO PRINCIPAL --- */
 .main-content {
+<<<<<<< HEAD
   grid-column: 2 / 3;
   grid-row: 2;
+=======
+>>>>>>> e583fc70d4f09ebf52234f5ffc70b134c6e9d7b5
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -130,12 +186,17 @@ body {
   justify-content: flex-start;
   padding: 40px;
   background-color: #fafafb;
+<<<<<<< HEAD
   min-height: calc(100vh - 72px);
+=======
+  min-height: calc(100vh - 89px);
+>>>>>>> e583fc70d4f09ebf52234f5ffc70b134c6e9d7b5
 }
 
 /* Cabeçalho do Perfil */
 .profile-header {
   display: flex;
+<<<<<<< HEAD
   align-items: center;
   justify-content: flex-start;
   gap: 20px;
@@ -143,26 +204,41 @@ body {
   max-width: 1100px;
   margin-bottom: 40px;
   text-align: left;
+=======
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  width: 100%;
+  max-width: 1100px;
+  margin-bottom: 40px;
+  text-align: center;
+>>>>>>> e583fc70d4f09ebf52234f5ffc70b134c6e9d7b5
 }
 
-/* Container para a foto de perfil (para posicionar o ícone) */
 .profile-picture-container {
   position: relative;
+<<<<<<< HEAD
   /* Adapta-se ao tamanho da imagem filha */
+=======
+>>>>>>> e583fc70d4f09ebf52234f5ffc70b134c6e9d7b5
   display: inline-block;
 }
 
-/* Esconde o input de arquivo real */
 #file-upload {
   display: none;
 }
 
-/* Estilo do ícone de edição (a <label>) */
 .edit-icon {
   position: absolute;
+<<<<<<< HEAD
   bottom: 5px; /* Posição sobre a foto */
   right: 5px; /* Posição sobre a foto */
 
+=======
+  bottom: 5px;
+  right: 5px;
+>>>>>>> e583fc70d4f09ebf52234f5ffc70b134c6e9d7b5
   background-color: var(--cor-branco);
   color: var(--cor-principal);
   font-size: 14px;
@@ -186,13 +262,21 @@ body {
   object-fit: cover;
   border: 4px solid var(--cor-branco);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+<<<<<<< HEAD
+=======
 }
 
-/* Estiliza os inputs de nome e título para parecerem texto */
+.profile-info {
+  text-align: center;
+  width: 100%;
+>>>>>>> e583fc70d4f09ebf52234f5ffc70b134c6e9d7b5
+}
+
 .profile-info .profile-nome-input,
 .profile-info .profile-titulo-input {
   border: none;
   background: none;
+<<<<<<< HEAD
   padding: 0;
   margin: 0;
   width: 100%;
@@ -201,27 +285,67 @@ body {
 
 .profile-info .profile-nome-input {
   font-size: 28px; /* Mesmo tamanho do H1 original */
+=======
+  padding: 5px 10px;
+  margin: 0;
+  width: 100%;
+  max-width: 400px;
+  font-family: inherit;
+  text-align: center;
+}
+
+.profile-info .profile-nome-input {
+  font-size: 28px;
+>>>>>>> e583fc70d4f09ebf52234f5ffc70b134c6e9d7b5
   font-weight: 700;
   color: var(--cor-texto);
 }
 
 .profile-info .profile-titulo-input {
+<<<<<<< HEAD
   font-size: 16px; /* Mesmo tamanho do P original */
   color: var(--cor-texto-claro); /* Mesmo cor do P original */
+=======
+  font-size: 16px;
+  color: var(--cor-texto-claro);
+>>>>>>> e583fc70d4f09ebf52234f5ffc70b134c6e9d7b5
   margin-top: 5px;
 }
 
-/* Foco sutil para mostrar que é editável */
 .profile-info .profile-nome-input:focus,
 .profile-info .profile-titulo-input:focus {
   outline: none;
+<<<<<<< HEAD
   box-shadow: 0 0 0 3px rgba(0, 49, 143, 0.1); /* Usa a cor principal */
+=======
+  box-shadow: 0 0 0 3px rgba(0, 49, 143, 0.1);
+>>>>>>> e583fc70d4f09ebf52234f5ffc70b134c6e9d7b5
   border-radius: 4px;
 }
 
-/* Grid do Perfil */
+/* --- VISUALIZAÇÃO --- */
+#profile-nome-texto {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--cor-texto);
+}
+
+#profile-titulo-texto {
+  font-size: 16px;
+  color: var(--cor-texto-claro);
+  margin-top: 5px;
+}
+
+#profile-sobre-texto {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--cor-texto);
+}
+
+/* --- GRID --- */
 .profile-grid {
   width: 100%;
+<<<<<<< HEAD
   max-width: 1100px;
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -234,15 +358,23 @@ body {
   display: flex;
   flex-direction: column;
   gap: 15px;
+=======
+  max-width: 700px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  align-items: start;
+>>>>>>> e583fc70d4f09ebf52234f5ffc70b134c6e9d7b5
 }
 
-/* Seção de Habilidades */
+/* Habilidades */
 .skills-section {
   background: var(--cor-branco);
   padding: 30px;
   border-radius: 8px;
   border: 1px solid var(--cor-borda);
   text-align: left;
+<<<<<<< HEAD
 }
 
 /* Seção de Eventos */
@@ -257,6 +389,14 @@ body {
 .skills-section h2,
 .events-section h2 {
   font-size: 24px;
+=======
+  width: 100%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+}
+
+.skills-section h2 {
+  font-size: 20px;
+>>>>>>> e583fc70d4f09ebf52234f5ffc70b134c6e9d7b5
   font-weight: 600;
   color: var(--cor-principal);
   margin-bottom: 25px;
@@ -288,7 +428,6 @@ body {
   box-shadow: 0 0 0 3px rgba(0, 49, 143, 0.1);
 }
 
-/* Botão */
 .btn-primary {
   padding: 12px 24px;
   border: none;
@@ -305,115 +444,38 @@ body {
   background-color: #00256e;
 }
 
-/* Lista de Habilidades */
 .skills-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 15px;
   margin-top: 30px;
 }
 
-.skill-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
-.skill-pill {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  background-color: var(--cor-branco);
-  border: 1px solid var(--cor-borda);
-  border-radius: 50px;
-  padding: 12px 24px;
-  font-size: 20px;
+.skill-tag {
+  font-size: 16px;
   font-weight: 600;
   color: var(--cor-texto);
-  min-width: 150px;
-  text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background-color: var(--cor-fundo-claro);
+  padding: 8px 16px;
+  border-radius: 50px;
+  border: 1px solid var(--cor-borda);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.skill-pill:hover {
-  transform: translateY(-3px);
-  border-color: var(--cor-principal);
-  box-shadow: 0 6px 14px rgba(0, 49, 143, 0.15);
-  background-color: #f8faff;
-  color: var(--cor-principal);
-  cursor: default;
-  transition: all 0.3s ease;
-}
-
-.skill-pill i {
-  font-size: 24px;
-}
-
-.skill-pill .fa-react {
-  color: #61dafb;
-}
-.skill-pill .fa-js-square {
-  color: #f7df1e;
-  background: #000;
-  border-radius: 4px;
-}
-
-/* Botão de Excluir */
-.delete-skill-btn {
-  background: none;
-  border: none;
+.skill-tag .remove-skill-btn {
+  font-size: 20px;
   color: var(--cor-texto-navegacao);
-  font-size: 18px;
   cursor: pointer;
-  transition: color 0.3s ease;
+  line-height: 1;
 }
 
-.delete-skill-btn:hover {
+.skill-tag .remove-skill-btn:hover {
   color: var(--cor-notificacao);
 }
 
-/* Lista de Eventos */
-.events-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-/* Card de Evento */
-.event-card {
-  background: var(--cor-fundo-claro);
-  padding: 20px 25px;
-  border-radius: 10px;
-  border: 1px solid var(--cor-borda);
-  text-align: left;
-  transition: all 0.2s ease;
-}
-
-.event-card:hover {
-  border-color: var(--cor-principal);
-  box-shadow: 0 4px 10px rgba(0, 49, 143, 0.1);
-}
-
-.event-card p {
-  font-size: 16px;
-  color: var(--cor-texto);
-  margin-bottom: 8px;
-  line-height: 1.5;
-}
-
-.event-card p:last-child {
-  margin-bottom: 0;
-}
-
-.event-card strong {
-  color: var(--cor-principal);
-  font-weight: 600;
-}
-
-
-/* Seção "Sobre Mim" */
+/* Sobre Mim */
 .about-section .about-card {
   background: var(--cor-branco);
   border: 1px solid var(--cor-borda);
@@ -430,7 +492,6 @@ body {
   margin-bottom: 15px;
 }
 
-/* Estiliza a textarea "Sobre Mim" */
 .about-card textarea {
   font-size: 16px;
   line-height: 1.6;
@@ -450,14 +511,17 @@ body {
   box-shadow: 0 0 0 3px rgba(0, 49, 143, 0.1);
 }
 
-/* Estilo para o botão "Salvar Alterações" */
 .btn-save {
   display: block;
   width: 100%;
   max-width: 250px;
+<<<<<<< HEAD
   margin: 40px auto 0 auto; /* Centralizado com espaço acima */
 
   /* Reutiliza o estilo do .btn-primary */
+=======
+  margin: 40px auto 0 auto;
+>>>>>>> e583fc70d4f09ebf52234f5ffc70b134c6e9d7b5
   padding: 12px 24px;
   border: none;
   border-radius: 50px;
@@ -504,8 +568,8 @@ body {
 }
 
 /* --- RESPONSIVIDADE --- */
-/* ESTA É A FORMA CORRETA DE USAR O @media - NO FIM DO ARQUIVO */
 @media (max-width: 900px) {
+<<<<<<< HEAD
   body {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto 1fr;
@@ -515,13 +579,32 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
+=======
+  .main-content {
+    padding: 20px;
+  }
+
+  .profile-header {
+    margin-bottom: 20px;
+>>>>>>> e583fc70d4f09ebf52234f5ffc70b134c6e9d7b5
   }
 
   .profile-grid {
     grid-template-columns: 1fr;
+<<<<<<< HEAD
     max-width: 700px;
   }
 
+=======
+    max-width: 100%;
+    gap: 20px;
+  }
+
+  .skills-section, .about-section .about-card {
+    padding: 20px;
+  }
+
+>>>>>>> e583fc70d4f09ebf52234f5ffc70b134c6e9d7b5
   .btn-float {
     bottom: 20px;
     right: 20px;

@@ -1,8 +1,13 @@
-const USUARIO_ID = 1;
+// ===============================================
+// ARQUIVO: perfil.js
+// ===============================================
 
-const API_URL = 'http://localhost:8080/api';
-const SERVER_URL = 'http://localhost:8080';
-const token = '';
+// As constantes API_URL, SERVER_URL e token são carregadas pelo global.js
+// NÃO É MAIS NECESSÁRIO DECLARÁ-LAS AQUI.
+
+// ID do usuário (NECESSÁRIO PARA A ABA DE EVENTOS)
+// TODO: Substituir por um ID dinâmico ou endpoint /me/inscricoes
+const USUARIO_ID = 1; 
 
 const skillIcons = {
   javascript: '<i class="fab fa-js-square" style="color:#f7df1e;"></i>',
@@ -22,8 +27,12 @@ const skillIcons = {
   sql: '<i class="fas fa-database" style="color:#4479A1;"></i>',
 };
 
+// Dados mocados para fallback
 const initialSkills = ["React", "Next.js", "JavaScript", "Python"];
 
+// ===============================================
+// INICIALIZAÇÃO DA PÁGINA
+// ===============================================
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const usuarioId = urlParams.get('usuarioId');
@@ -31,8 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeTabs();
 
     if (usuarioId) {
+        // Modo de visualização pública
         carregarPerfilPublico(usuarioId);
         
+        // Esconde elementos de edição
         const saveBtn = document.getElementById('save-profile-btn');
         if (saveBtn) saveBtn.style.display = 'none';
         
@@ -43,9 +54,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (addSkillForm) addSkillForm.style.display = 'none';
         
     } else {
+        // Modo de edição (meu perfil)
         carregarMeuPerfilParaEdicao();
         
-        const saveBtn = document.getElementById('save-profile-btn');
+        // Ativa os botões de edição
+        
+        // NOTA: Você não tem um botão "Salvar" no seu HTML.
+        // Se você adicionar um <button id="save-profile-btn">...</button>
+        // este código irá funcionar:
+        const saveBtn = document.getElementById('save-profile-btn'); 
         if (saveBtn) {
             saveBtn.addEventListener('click', salvarMeuPerfil);
         }
@@ -70,6 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
         
+        // Event listener para deletar skill (só no modo edição)
         const skillsList = document.getElementById('skills-list');
         if (skillsList) {
             skillsList.addEventListener('click', (e) => {
@@ -84,10 +102,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
-    
-    carregarEventosInscritos();
 });
 
+// ===============================================
+// LÓGICA DAS ABAS
+// ===============================================
 function initializeTabs() {
     const tabBtns = document.querySelectorAll(".tab-btn");
     const tabContents = document.querySelectorAll(".tab-content");
@@ -105,6 +124,7 @@ function initializeTabs() {
                 targetContent.classList.add("active");
             }
 
+            // Carrega eventos SÓ QUANDO a aba é clicada pela primeira vez
             if (targetTab === "eventos") {
                 const eventosList = document.getElementById("eventos-list");
                 if (eventosList && eventosList.children.length === 0 && eventosList.style.display === 'none') {
@@ -115,31 +135,41 @@ function initializeTabs() {
     });
 }
 
+// ===============================================
+// FUNÇÕES DE PERFIL (CARREGAR E PREENCHER)
+// ===============================================
 async function carregarMeuPerfilParaEdicao() {
     try {
+        // `token` e `API_URL` vêm do global.js
         const response = await fetch(`${API_URL}/perfis/me`, {
             headers: { 'Authorization': 'Bearer ' + token }
         });
         if (!response.ok) throw new Error('Falha ao carregar seu perfil para edição');
 
         const perfil = await response.json();
-        preencherDadosPerfil(perfil, true);
+        preencherDadosPerfil(perfil, true); // true = modoEdicao
 
     } catch (error) {
-        console.error('Erro ao carregar seu perfil:', error);
-        renderizarSkills(initialSkills, true);
+        console.error('Erro ao carregar seu perfil (perfil.js):', error);
+        // Fallback se a API falhar (mostra dados mocados)
+        preencherDadosPerfil({
+            nomeCompleto: "Meu Nome (Falha na API)",
+            titulo: "Meu Título (Falha na API)",
+            sobreMim: "Não foi possível carregar o 'sobre mim'.",
+            habilidades: initialSkills
+        }, true);
     }
 }
 
 async function carregarPerfilPublico(usuarioId) {
     try {
         const response = await fetch(`${API_URL}/perfis/usuario/${usuarioId}`, {
-            headers: { 'Authorization': 'Bearer ' + token }
+            headers: { 'Authorization': 'Bearer ' + token } // Token ainda é necessário
         });
         if (!response.ok) throw new Error('Falha ao carregar perfil do usuário');
 
         const perfil = await response.json();
-        preencherDadosPerfil(perfil, false);
+        preencherDadosPerfil(perfil, false); // false = modoEdicao
 
     } catch (error) {
         console.error('Erro ao carregar perfil público:', error);
@@ -148,7 +178,13 @@ async function carregarPerfilPublico(usuarioId) {
 }
 
 function preencherDadosPerfil(perfil, modoEdicao) {
+    const imgPreview = document.getElementById('main-profile-pic');
+    if (imgPreview && perfil.fotoPerfilUrl) {
+        imgPreview.src = SERVER_URL + perfil.fotoPerfilUrl;
+    }
+
     if (modoEdicao) {
+        // Preenche os <input> e <textarea>
         const nomeInput = document.getElementById('profile-nome');
         const tituloInput = document.getElementById('profile-titulo');
         const sobreTextarea = document.getElementById('profile-sobre');
@@ -157,8 +193,9 @@ function preencherDadosPerfil(perfil, modoEdicao) {
         if (tituloInput) tituloInput.value = perfil.titulo || '';
         if (sobreTextarea) sobreTextarea.value = perfil.sobreMim || '';
         
-        renderizarSkills(perfil.habilidades || initialSkills, true);
+        renderizarSkills(perfil.habilidades || [], true); // Renderiza com 'X' de deletar
     } else {
+        // Modo visualização: Substitui <input> por texto
         const nomeInput = document.getElementById('profile-nome');
         const tituloInput = document.getElementById('profile-titulo');
         const sobreTextarea = document.getElementById('profile-sobre');
@@ -173,12 +210,7 @@ function preencherDadosPerfil(perfil, modoEdicao) {
             sobreTextarea.replaceWith(criarElementoTexto('p', perfil.sobreMim || 'Sem descrição.', 'profile-sobre-texto'));
         }
         
-        renderizarSkills(perfil.habilidades || [], false);
-    }
-
-    const imgPreview = document.getElementById('main-profile-pic');
-    if (imgPreview && perfil.fotoPerfilUrl) {
-        imgPreview.src = SERVER_URL + perfil.fotoPerfilUrl;
+        renderizarSkills(perfil.habilidades || [], false); // Renderiza sem 'X'
     }
 }
 
@@ -186,13 +218,17 @@ function criarElementoTexto(tag, texto, id) {
     const el = document.createElement(tag);
     el.id = id;
     el.textContent = texto;
+    if (tag === 'h1') el.classList.add('profile-nome-texto');
+    if (tag === 'h3') el.classList.add('profile-titulo-texto');
     return el;
 }
 
+// ===============================================
+// FUNÇÕES DE PERFIL (SALVAR E UPLOAD)
+// ===============================================
 async function salvarMeuPerfil(event) {
     event.preventDefault(); 
-    const btnSalvar = document.getElementById('save-profile-btn');
-    if (!btnSalvar) return;
+    const btnSalvar = event.target; 
     
     btnSalvar.disabled = true;
     btnSalvar.textContent = 'Salvando...';
@@ -201,7 +237,7 @@ async function salvarMeuPerfil(event) {
         nomeCompleto: document.getElementById('profile-nome')?.value || '',
         titulo: document.getElementById('profile-titulo')?.value || '',
         sobreMim: document.getElementById('profile-sobre')?.value || '',
-        habilidades: getSkillsDaLista(),
+        habilidades: getSkillsDaLista(), 
     };
 
     try {
@@ -216,6 +252,7 @@ async function salvarMeuPerfil(event) {
         if (!response.ok) throw new Error('Falha ao salvar. Tente novamente.');
         alert('Perfil salvo com sucesso!');
         
+        // Atualiza o header (se a função global existir)
         if (typeof carregarDadosUsuario === 'function') {
             carregarDadosUsuario();
         }
@@ -248,11 +285,14 @@ async function uploadMinhaFoto(event) {
         if (!response.ok) throw new Error((await response.json()).erro || 'Falha no upload.');
 
         const resultado = await response.json();
+        
+        // 1. Atualiza a foto principal da página
         const imgPreview = document.getElementById('main-profile-pic');
         if (imgPreview) {
             imgPreview.src = SERVER_URL + resultado.novaUrl + '?t=' + new Date().getTime();
         }
         
+        // 2. SINCRONIZA: Chama a função do global.js para atualizar o header
         if (typeof carregarDadosUsuario === 'function') {
             carregarDadosUsuario();
         }
@@ -266,13 +306,16 @@ async function uploadMinhaFoto(event) {
     }
 }
 
+// ===============================================
+// FUNÇÕES DE HABILIDADES (SKILLS)
+// ===============================================
 function adicionarSkillDaCaixa() {
     const input = document.getElementById('skill-input');
     if (!input) return;
     
     const skillName = input.value.trim();
     if (skillName) {
-        const skillElement = createSkillElement(skillName);
+        const skillElement = createSkillElement(skillName, true); 
         const skillsList = document.getElementById('skills-list');
         if (skillsList) {
             skillElement.classList.add('fade-in');
@@ -282,20 +325,24 @@ function adicionarSkillDaCaixa() {
     }
 }
 
-function createSkillElement(skillName) {
+function createSkillElement(skillName, editavel) {
     const skillKey = skillName.toLowerCase();
     const iconHTML = skillIcons[skillKey] || '<i class="fas fa-code" style="color:#00318f;"></i>';
 
     const skillItem = document.createElement("div");
     skillItem.classList.add("skill-item");
+    
+    const deleteButtonHTML = editavel 
+        ? '<button class="delete-skill-btn" title="Remover"><i class="fas fa-times"></i></button>' 
+        : '';
+
     skillItem.innerHTML = `
         <div class="skill-pill">
             ${iconHTML}
             <span>${skillName}</span>
-            <button class="delete-skill-btn" title="Remover"><i class="fas fa-times"></i></button>
+            ${deleteButtonHTML}
         </div>
     `;
-
     return skillItem;
 }
 
@@ -303,7 +350,7 @@ function renderizarSkills(habilidadesArray, editavel) {
     const list = document.getElementById('skills-list');
     if (!list) return;
     
-    list.innerHTML = '';
+    list.innerHTML = ''; 
 
     let skillsParaRenderizar = [];
 
@@ -314,32 +361,9 @@ function renderizarSkills(habilidadesArray, editavel) {
     }
 
     skillsParaRenderizar.forEach(skillName => {
-        if (editavel) {
-            const skillElement = createSkillElement(skillName.trim());
-            list.appendChild(skillElement);
-        } else {
-            criarTagSkillVisualizacao(skillName.trim());
-        }
+        const skillElement = createSkillElement(skillName.trim(), editavel);
+        list.appendChild(skillElement);
     });
-}
-
-function criarTagSkillVisualizacao(skillName) {
-    const list = document.getElementById('skills-list');
-    if (!list) return;
-    
-    const skillKey = skillName.toLowerCase();
-    const iconHTML = skillIcons[skillKey] || '<i class="fas fa-code" style="color:#00318f;"></i>';
-
-    const skillItem = document.createElement("div");
-    skillItem.classList.add("skill-item");
-    skillItem.innerHTML = `
-        <div class="skill-pill">
-            ${iconHTML}
-            <span>${skillName}</span>
-        </div>
-    `;
-    
-    list.appendChild(skillItem);
 }
 
 function getSkillsDaLista() {
@@ -348,6 +372,9 @@ function getSkillsDaLista() {
     return skillsArray;
 }
 
+// ===============================================
+// FUNÇÕES DE EVENTOS (ABA "MINHAS INSCRIÇÕES")
+// ===============================================
 async function carregarEventosInscritos() {
     const loadingEl = document.getElementById("eventos-loading");
     const listEl = document.getElementById("eventos-list");
@@ -360,14 +387,15 @@ async function carregarEventosInscritos() {
     emptyEl.style.display = "none";
 
     try {
-        const response = await fetch(`${API_URL}/usuarios/${USUARIO_ID}/inscricoes`);
+        const response = await fetch(`${API_URL}/usuarios/${USUARIO_ID}/inscricoes`, {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
 
         if (!response.ok) {
             throw new Error("Erro ao carregar eventos");
         }
 
         const inscricoes = await response.json();
-
         loadingEl.style.display = "none";
 
         if (inscricoes.length === 0) {
@@ -411,14 +439,9 @@ function criarCardEvento(evento, inscricao) {
 
     card.innerHTML = `
         <span class="evento-status ${statusClass}">${statusTexto}</span>
-        
-        <div class="evento-icon">
-            <i class="${iconeCategoria}"></i>
-        </div>
-
+        <div class="evento-icon"><i class="${iconeCategoria}"></i></div>
         <div class="evento-content">
             <h3>${evento.nome}</h3>
-            
             <div class="evento-meta">
                 <div class="evento-meta-item">
                     <i class="fas fa-calendar-alt"></i>
@@ -437,9 +460,7 @@ function criarCardEvento(evento, inscricao) {
                     <span>${capitalize(evento.categoria)}</span>
                 </div>
             </div>
-
             <p class="evento-description">${evento.descricao}</p>
-
             <div class="evento-actions">
                 <button class="btn-evento btn-detalhes" onclick="verDetalhesEvento(${evento.id})">
                     <i class="fas fa-eye"></i> Ver Detalhes
@@ -452,9 +473,12 @@ function criarCardEvento(evento, inscricao) {
             </div>
         </div>
     `;
-
     return card;
 }
+
+// ===============================================
+// FUNÇÕES UTILITÁRIAS (Eventos)
+// ===============================================
 
 function getIconeCategoria(categoria) {
     const icones = {
@@ -466,13 +490,13 @@ function getIconeCategoria(categoria) {
         mentoria: "fas fa-user-tie",
         outro: "fas fa-calendar-day",
     };
-
     return icones[categoria.toLowerCase()] || "fas fa-calendar-day";
 }
 
 function formatarData(data) {
     if (!data) return "";
-    const partes = data.split("-");
+    const partes = data.split("-"); // Espera AAAA-MM-DD
+    if (partes.length < 3) return data; 
     return `${partes[2]}/${partes[1]}/${partes[0]}`;
 }
 
@@ -487,17 +511,17 @@ function verDetalhesEvento(eventoId) {
 
 async function cancelarInscricao(inscricaoId, eventoId) {
     const confirmar = confirm("Tem certeza que deseja cancelar sua inscrição neste evento?");
-
     if (!confirmar) return;
 
     try {
         const response = await fetch(`${API_URL}/inscricoes/${inscricaoId}/cancelar`, {
             method: "PUT",
+            headers: { 'Authorization': 'Bearer ' + token }
         });
 
         if (response.ok) {
             alert("Inscrição cancelada com sucesso!");
-            carregarEventosInscritos();
+            carregarEventosInscritos(); // Recarrega a lista
         } else {
             alert("Erro ao cancelar inscrição. Tente novamente.");
         }

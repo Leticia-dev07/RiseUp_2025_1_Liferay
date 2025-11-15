@@ -1,21 +1,6 @@
-// ===============================================
-// ARQUIVO: detalhes-evento.js (MAGRO E FOCADO)
-// ===============================================
-//
-// NOTA:
-// O 'global.js' já cuidou de:
-// 1. API_URL, SERVER_URL, token
-// 2. carregarDadosUsuario()
-// 3. setupGlobalSearch()
-//
-
-// Variável global APENAS para esta página
 let eventoAtual = null;
 
-// "Liga" as funções específicas desta página
 document.addEventListener('DOMContentLoaded', function () {
-    // O 'global.js' já rodou seu próprio DOMContentLoaded
-    // para o header. Este é só para a página de detalhes.
     
     const urlParams = new URLSearchParams(window.location.search);
     const eventoId = urlParams.get('id');
@@ -27,12 +12,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-// =====================
-// FETCH 1: CARREGAR DETALHES
-// =====================
 async function carregarDetalhesEvento(eventoId) {
     try {
-        // 'API_URL' e 'token' vêm do global.js
         const response = await fetch(`${API_URL}/eventos/${eventoId}`, {
             method: 'GET',
             headers: { "Authorization": "Bearer " + token }
@@ -49,7 +30,6 @@ async function carregarDetalhesEvento(eventoId) {
         eventoAtual = await response.json();
         preencherDetalhesEvento(eventoAtual);
         
-        // Chama o próximo fetch
         verificarStatusInscricao(eventoId); 
     } catch (erro) {
         console.error('Erro ao carregar evento:', erro);
@@ -57,9 +37,6 @@ async function carregarDetalhesEvento(eventoId) {
     }
 }
 
-// =====================
-// FETCH 2: VERIFICAR STATUS DA INSCRIÇÃO
-// =====================
 async function verificarStatusInscricao(eventoId) {
     try {
         const response = await fetch(`${API_URL}/eventos/${eventoId}/status`, {
@@ -76,9 +53,6 @@ async function verificarStatusInscricao(eventoId) {
     }
 }
 
-// =====================
-// FETCH 3: FAZER INSCRIÇÃO
-// =====================
 async function inscreverEvento() {
     const btn = document.getElementById('inscricaoBtn');
     const msg = document.getElementById('statusMessage');
@@ -110,11 +84,6 @@ async function inscreverEvento() {
     }
 }
 
-
-// =====================
-// FUNÇÕES AUXILIARES (Helpers)
-// =====================
-
 function preencherDetalhesEvento(evento) {
     document.getElementById('eventName').textContent = evento.nome;
     document.getElementById('eventDescription').textContent = evento.descricao;
@@ -134,9 +103,8 @@ function atualizarBotaoInscricao(status) {
     const btn = document.getElementById('inscricaoBtn');
     const msg = document.getElementById('statusMessage');
 
-  	// Pega o span dentro do botão (se existir)
 	const btnText = btn.querySelector('span');
-	const textTarget = btnText || btn; // Altera o span ou o próprio botão
+	const textTarget = btnText || btn;
 
     if (status.jaInscrito) {
         textTarget.textContent = 'Já Inscrito';
@@ -149,7 +117,6 @@ function atualizarBotaoInscricao(status) {
     } else {
         textTarget.textContent = 'Inscrever-se';
         btn.disabled = false;
-        // Remove o 'onclick' do HTML e adiciona o listener de forma segura
         if(btn.hasAttribute('onclick')) {
             btn.removeAttribute('onclick');
         }

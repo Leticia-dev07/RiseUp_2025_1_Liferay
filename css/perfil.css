@@ -767,4 +767,69 @@ body {
       padding: 10px 20px;
     }
   }
+
+  /* ===================================
+   HISTÓRICO DE EVENTOS - NOVO
+   =================================== */
+
+.evento-status.concluido {
+    background: #cfe2ff;
+    color: #084298;
+}
+
+.evento-status.cancelado {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.certificado-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    border-radius: 8px;
+    margin-top: 15px;
+    font-weight: 600;
+    color: #856404;
+}
+
+.certificado-info i {
+    font-size: 20px;
+    color: #856404;
+}
+
+.btn-download-certificado {
+    background: #28a745;
+    color: var(--cor-branco);
+}
+
+.btn-download-certificado:hover {
+    background: #218838;
+}
+
+.historico-card {
+    opacity: 0.95;
+}
+
+.historico-card:hover {
+    opacity: 1;
+}
+
+.evento-status.confirmado {
+    background: #d4edda;
+    color: #155724;
+  }
+
+  .evento-status.concluido {
+    background: #cfe2ff;
+    color: #084298;
+  }
+
+  .evento-status.cancelado {
+    background: #f8d7da;
+    color: #721c24;
+  }
+
+  
 }

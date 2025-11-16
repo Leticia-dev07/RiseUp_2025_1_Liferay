@@ -76,10 +76,14 @@
                 <button class="tab-btn" data-tab="eventos">
                     <i class="fas fa-calendar-check"></i> Minhas inscrições
                 </button>
+                <button class="tab-btn" data-tab="historico">
+                    <i class="fas fa-history"></i> Histórico
+                </button>
             </div>
         </div>
 
         <div class="profile-grid">
+            <!-- ABA 1: HABILIDADES (coluna esquerda) -->
             <div class="tab-content active" id="tab-habilidades">
                 <section class="skills-section">
                     <h2>Minhas habilidades</h2>
@@ -93,10 +97,11 @@
                     </div>
 
                     <div class="skills-list" id="skills-list">
-                        </div>
+                    </div>
                 </section>
             </div>
 
+            <!-- ABA 2: MINHAS INSCRIÇÕES (largura total) -->
             <div class="tab-content" id="tab-eventos">
                 <section class="eventos-section">
                     <h2>Eventos Inscritos</h2>
@@ -108,7 +113,7 @@
                     </div>
 
                     <div id="eventos-list" class="eventos-list" style="display: none;">
-                        </div>
+                    </div>
 
                     <div id="eventos-empty" class="empty-state" style="display: none;">
                         <i class="fas fa-calendar-times"></i>
@@ -119,6 +124,30 @@
                 </section>
             </div>
 
+            <!-- ABA 3: HISTÓRICO (largura total) -->
+            <div class="tab-content" id="tab-historico">
+                <section class="eventos-section">
+                    <h2>Histórico de Eventos</h2>
+                    <p class="section-description">Eventos que você já participou</p>
+
+                    <div id="historico-loading" class="loading-container">
+                        <div class="spinner-large"></div>
+                        <p>Carregando seu histórico...</p>
+                    </div>
+
+                    <div id="historico-list" class="eventos-list" style="display: none;">
+                    </div>
+
+                    <div id="historico-empty" class="empty-state" style="display: none;">
+                        <i class="fas fa-history"></i>
+                        <h3>Nenhum histórico disponível</h3>
+                        <p>Você ainda não participou de nenhum evento.</p>
+                        <a href="homepage.html" class="btn-primary">Ver Eventos Disponíveis</a>
+                    </div>
+                </section>
+            </div>
+
+            <!-- COLUNA DIREITA: SOBRE MIM (sempre visível quando habilidades está ativa) -->
             <aside class="about-section">
                 <div class="about-card">
                     <h3>Sobre mim</h3>

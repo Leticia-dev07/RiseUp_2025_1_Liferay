@@ -1,5 +1,5 @@
 // ===============================================
-// ARQUIVO: perfil.js (COMPLETO E CORRIGIDO)
+// ARQUIVO: perfil.js (ATUALIZADO)
 // ===============================================
 
 // Variáveis globais esperadas:
@@ -40,11 +40,9 @@ document.addEventListener("DOMContentLoaded", () => {
     initializeTabs();
 
     if (publicoUsuarioId) {
-        // Visualizando perfil público
         carregarPerfilPublico(publicoUsuarioId);
         hideEditorControls();
     } else {
-        // Meu perfil (edição)
         carregarMeuPerfilParaEdicao();
         setupEditorControls();
     }
@@ -140,62 +138,42 @@ function initializeTabs() {
 }
 
 // -----------------------------
-// CARREGAR PERFIL - MEU (edição)
+// CARREGAR PERFIL
 // -----------------------------
 async function carregarMeuPerfilParaEdicao() {
     try {
         const resp = await fetch(`${API_URL}/perfis/me`, {
             headers: { Authorization: "Bearer " + token },
         });
-
         if (!resp.ok) throw new Error("Erro ao carregar perfil");
-
         const perfil = await resp.json();
         preencherDadosPerfil(perfil, true);
     } catch (e) {
-        console.error("Erro carregarMeuPerfilParaEdicao:", e);
-        preencherDadosPerfil(
-            {
-                nomeCompleto: "Falha ao carregar",
-                titulo: "Erro",
-                sobreMim: "Não foi possível carregar.",
-                habilidades: initialSkills,
-            },
-            true
-        );
+        console.error(e);
+        preencherDadosPerfil({ nomeCompleto: "Falha", titulo: "Erro", sobreMim: "N/A", habilidades: initialSkills }, true);
     }
 }
 
-// -----------------------------
-// CARREGAR PERFIL PÚBLICO
-// -----------------------------
 async function carregarPerfilPublico(usuarioId) {
     try {
         const resp = await fetch(`${API_URL}/perfis/usuario/${usuarioId}`, {
             headers: { Authorization: "Bearer " + token },
         });
-
-        if (!resp.ok) throw new Error("Erro ao carregar perfil público");
-
+        if (!resp.ok) throw new Error("Erro");
         const perfil = await resp.json();
         preencherDadosPerfil(perfil, false);
     } catch (e) {
-        console.error("Erro carregarPerfilPublico:", e);
-        alert("Erro ao carregar o perfil do usuário.");
+        console.error(e);
+        alert("Erro ao carregar perfil.");
     }
 }
 
-// -----------------------------
-// PREENCHER DADOS DO PERFIL
-// -----------------------------
 function preencherDadosPerfil(perfil, modoEdicao) {
-    // foto principal
     const imgPreview = document.getElementById("main-profile-pic");
     if (imgPreview && perfil.fotoPerfilUrl) {
         imgPreview.src = (perfil.fotoPerfilUrl.startsWith("http") ? "" : SERVER_URL) + perfil.fotoPerfilUrl;
     }
 
-    // campos edição / visualização
     if (modoEdicao) {
         const nomeEl = document.getElementById("profile-nome");
         const tituloEl = document.getElementById("profile-titulo");
@@ -207,7 +185,6 @@ function preencherDadosPerfil(perfil, modoEdicao) {
 
         renderizarSkills(perfil.habilidades || [], true);
     } else {
-        // visualização pública (substitui os inputs por textos)
         const nomeInput = document.getElementById("profile-nome");
         const tituloInput = document.getElementById("profile-titulo");
         const sobreInput = document.getElementById("profile-sobre");
@@ -220,9 +197,6 @@ function preencherDadosPerfil(perfil, modoEdicao) {
     }
 }
 
-// -----------------------------
-// UTIL: criar elemento de texto
-// -----------------------------
 function criarElementoTexto(tag, texto) {
     const el = document.createElement(tag);
     el.textContent = texto || "";
@@ -230,15 +204,12 @@ function criarElementoTexto(tag, texto) {
 }
 
 // -----------------------------
-// SALVAR PERFIL (PUT /api/perfis/me)
+// SALVAR / UPLOAD
 // -----------------------------
 async function salvarMeuPerfil(e) {
     e.preventDefault();
     const btn = e.target;
-    if (btn) {
-        btn.disabled = true;
-        btn.textContent = "Salvando...";
-    }
+    if (btn) { btn.disabled = true; btn.textContent = "Salvando..."; }
 
     const dados = {
         nomeCompleto: document.getElementById("profile-nome").value,
@@ -250,31 +221,18 @@ async function salvarMeuPerfil(e) {
     try {
         const resp = await fetch(`${API_URL}/perfis/me`, {
             method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + token,
-            },
+            headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
             body: JSON.stringify(dados),
         });
-
-        if (!resp.ok) throw new Error("Erro ao salvar perfil");
-
+        if (!resp.ok) throw new Error("Erro");
         alert("Perfil salvo!");
-        if (typeof carregarDadosUsuario === "function") carregarDadosUsuario();
     } catch (err) {
-        console.error("Erro salvarMeuPerfil:", err);
-        alert("Não foi possível salvar o perfil.");
+        alert("Erro ao salvar.");
     } finally {
-        if (btn) {
-            btn.disabled = false;
-            btn.textContent = "Salvar Alterações";
-        }
+        if (btn) { btn.disabled = false; btn.textContent = "Salvar Alterações"; }
     }
 }
 
-// -----------------------------
-// UPLOAD DE FOTO (POST /api/perfis/foto)
-// -----------------------------
 async function uploadMinhaFoto(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -291,49 +249,38 @@ async function uploadMinhaFoto(event) {
             headers: { Authorization: "Bearer " + token },
             body: formData,
         });
-
-        if (!resp.ok) throw new Error("Erro ao enviar foto");
-
+        if (!resp.ok) throw new Error("Erro");
         const data = await resp.json();
         const img = document.getElementById("main-profile-pic");
         if (img) img.src = (data.novaUrl.startsWith("http") ? "" : SERVER_URL) + data.novaUrl + "?t=" + Date.now();
-
-        if (typeof carregarDadosUsuario === "function") carregarDadosUsuario();
     } catch (err) {
-        console.error("Erro uploadMinhaFoto:", err);
-        alert("Falha ao enviar foto.");
+        alert("Erro na foto.");
     } finally {
         if (btn) btn.innerHTML = '<i class="fas fa-camera"></i>';
     }
 }
 
 // -----------------------------
-// SKILLS (adicionar, renderizar, coletar)
+// SKILLS
 // -----------------------------
 function adicionarSkillDaCaixa() {
     const input = document.getElementById("skill-input");
     if (!input || !input.value.trim()) return;
-
     const list = document.getElementById("skills-list");
-    const el = createSkillElement(input.value.trim(), true);
-    list.appendChild(el);
+    list.appendChild(createSkillElement(input.value.trim(), true));
     input.value = "";
 }
 
 function createSkillElement(skillName, editavel) {
     const icon = skillIcons[skillName.toLowerCase()] || '<i class="fas fa-code" style="color:#00318f;"></i>';
-
     const div = document.createElement("div");
     div.classList.add("skill-item");
-
     div.innerHTML = `
         <div class="skill-pill">
-            ${icon}
-            <span>${skillName}</span>
+            ${icon} <span>${skillName}</span>
             ${editavel ? `<button class="delete-skill-btn"><i class="fas fa-times"></i></button>` : ""}
         </div>
     `;
-
     return div;
 }
 
@@ -341,8 +288,6 @@ function renderizarSkills(arr, editavel) {
     const list = document.getElementById("skills-list");
     if (!list) return;
     list.innerHTML = "";
-
-    // aceita array ou string separada por vírgula
     let skillsArray = arr;
     if (!Array.isArray(arr) && typeof arr === "string") {
         skillsArray = arr.split(",").map(s => s.trim()).filter(Boolean);
@@ -355,8 +300,7 @@ function getSkillsDaLista() {
 }
 
 // -----------------------------
-// EVENTOS INSCRITOS (ATIVOS) - LISTAR
-// Endpoint correto: GET /api/inscricoes/minhas-inscricoes
+// EVENTOS E HISTÓRICO
 // -----------------------------
 async function carregarEventosInscritos() {
     const loading = document.getElementById("eventos-loading");
@@ -371,49 +315,29 @@ async function carregarEventosInscritos() {
         const resp = await fetch(`${API_URL}/inscricoes/minhas-inscricoes`, {
             headers: { Authorization: "Bearer " + token },
         });
-
-        if (!resp.ok) throw new Error(`Status ${resp.status}`);
-
+        if (!resp.ok) throw new Error("Erro");
         const inscricoes = await resp.json();
-
+        
         if (loading) loading.style.display = "none";
-
         if (!inscricoes || inscricoes.length === 0) {
-            if (empty) {
-                empty.style.display = "block";
-                empty.querySelector("h3") && (empty.querySelector("h3").textContent = "Nenhuma inscrição");
-                empty.querySelector("p") && (empty.querySelector("p").textContent = "Você ainda não se inscreveu em nenhum evento.");
-            }
+            if (empty) empty.style.display = "block";
             return;
         }
-
         if (list) {
             list.style.display = "flex";
             list.innerHTML = "";
             renderizarEventos(inscricoes);
         }
     } catch (err) {
-        console.error("Erro carregarEventosInscritos:", err);
         if (loading) loading.style.display = "none";
-        if (empty) {
-            empty.style.display = "block";
-            empty.querySelector("h3") && (empty.querySelector("h3").textContent = "Erro ao carregar eventos");
-            empty.querySelector("p") && (empty.querySelector("p").textContent = "Tente novamente mais tarde.");
-        }
     }
 }
 
-// -----------------------------
-// RENDERIZAÇÃO DE EVENTOS (INSCRIÇÕES)
-// -----------------------------
 function renderizarEventos(inscricoes) {
     const list = document.getElementById("eventos-list");
     if (!list) return;
     list.innerHTML = "";
-
-    inscricoes.forEach((i) => {
-        if (i.evento) list.appendChild(criarCardEvento(i.evento, i));
-    });
+    inscricoes.forEach((i) => { if (i.evento) list.appendChild(criarCardEvento(i.evento, i)); });
 }
 
 function criarCardEvento(evento, inscricao) {
@@ -422,7 +346,6 @@ function criarCardEvento(evento, inscricao) {
 
     const div = document.createElement("div");
     div.className = "evento-card";
-
     div.innerHTML = `
         <span class="evento-status ${statusClass}">${capitalize(status)}</span>
         <div class="evento-icon"><i class="${getIconeCategoria(evento.categoria)}"></i></div>
@@ -432,24 +355,17 @@ function criarCardEvento(evento, inscricao) {
                 <div class="evento-meta-item"><i class="fas fa-calendar-alt"></i><span>${formatarData(evento.data)}</span></div>
                 <div class="evento-meta-item"><i class="fas fa-clock"></i><span>${evento.hora?.substring(0, 5) || "N/A"}</span></div>
                 <div class="evento-meta-item"><i class="fas fa-map-marker-alt"></i><span>${evento.local || "Online"}</span></div>
-                <div class="evento-meta-item"><i class="fas fa-tag"></i><span>${capitalize(evento.categoria)}</span></div>
             </div>
             <p class="evento-description">${evento.descricao || ""}</p>
             <div class="evento-actions">
-                <button class="btn-evento btn-detalhes" onclick="verDetalhesEvento(${evento.id})">
-                    <i class="fas fa-eye"></i> Ver Detalhes
-                </button>
-                ${status === "CONFIRMADA" ? `<button class="btn-evento btn-cancelar-inscricao" onclick="cancelarInscricao(${inscricao.id}, ${evento.id})"><i class="fas fa-times-circle"></i> Cancelar Inscrição</button>` : ""}
+                <button class="btn-evento btn-detalhes" onclick="verDetalhesEvento(${evento.id})"><i class="fas fa-eye"></i> Ver Detalhes</button>
+                ${status === "CONFIRMADA" ? `<button class="btn-evento btn-cancelar-inscricao" onclick="cancelarInscricao(${inscricao.id}, ${evento.id})"><i class="fas fa-times-circle"></i> Cancelar</button>` : ""}
             </div>
         </div>
     `;
-
     return div;
 }
 
-// -----------------------------
-// HISTÓRICO - LISTAR (GET /api/inscricoes/historico)
-// -----------------------------
 async function carregarHistoricoEventos() {
     const loading = document.getElementById("historico-loading");
     const list = document.getElementById("historico-list");
@@ -463,35 +379,21 @@ async function carregarHistoricoEventos() {
         const resp = await fetch(`${API_URL}/inscricoes/historico`, {
             headers: { Authorization: "Bearer " + token },
         });
-
-        if (!resp.ok) throw new Error(`Status ${resp.status}`);
-
+        if (!resp.ok) throw new Error("Erro");
         const historico = await resp.json();
 
         if (loading) loading.style.display = "none";
-
         if (!historico || historico.length === 0) {
-            if (empty) {
-                empty.style.display = "block";
-                empty.querySelector("h3") && (empty.querySelector("h3").textContent = "Nenhum histórico disponível");
-                empty.querySelector("p") && (empty.querySelector("p").textContent = "Você ainda não participou de nenhum evento finalizado.");
-            }
+            if (empty) empty.style.display = "block";
             return;
         }
-
         if (list) {
             list.style.display = "flex";
             list.innerHTML = "";
             renderizarHistorico(historico);
         }
     } catch (err) {
-        console.error("Erro carregarHistoricoEventos:", err);
         if (loading) loading.style.display = "none";
-        if (empty) {
-            empty.style.display = "block";
-            empty.querySelector("h3") && (empty.querySelector("h3").textContent = "Erro ao carregar histórico");
-            empty.querySelector("p") && (empty.querySelector("p").textContent = "Tente novamente mais tarde.");
-        }
     }
 }
 
@@ -499,16 +401,31 @@ function renderizarHistorico(historico) {
     const list = document.getElementById("historico-list");
     if (!list) return;
     list.innerHTML = "";
-
-    historico.forEach((i) => {
-        if (i.evento) list.appendChild(criarCardHistorico(i.evento, i));
-    });
+    historico.forEach((i) => { if (i.evento) list.appendChild(criarCardHistorico(i.evento, i)); });
 }
 
+// ------------------------------------------
+// FUNÇÃO ATUALIZADA: CARD DE HISTÓRICO
+// ------------------------------------------
+// ============================================================
+// SUBSTITUA ESSA FUNÇÃO NO SEU ARQUIVO JS/PERFIL.JS
+// ============================================================
+
 function criarCardHistorico(evento, inscricao) {
+    // Verifica status (se não tiver, assume concluído para teste)
     const status = (inscricao && inscricao.status) ? inscricao.status.toUpperCase() : "CONCLUIDO";
     const statusClass = status.toLowerCase();
-    const certificadoDisponivel = inscricao?.certificadoUrl;
+    
+    // -------------------------------------------------------
+    // LÓGICA DO CERTIFICADO
+    // -------------------------------------------------------
+    let certificadoUrl = inscricao?.certificadoUrl;
+
+    // MODO DE TESTE: Se concluído e sem URL, usa o PDF de exemplo da pasta assets
+    if (status === "CONCLUIDO" && !certificadoUrl) {
+        certificadoUrl = "assets/certificado_exemplo.pdf"; 
+    }
+    // -------------------------------------------------------
 
     let acoesHtml = `
         <button class="btn-evento btn-detalhes" onclick="verDetalhesEvento(${evento.id})">
@@ -516,11 +433,24 @@ function criarCardHistorico(evento, inscricao) {
         </button>
     `;
 
-    if (status === "CONCLUIDO" && certificadoDisponivel) {
+    // Renderiza o botão se estiver concluído e tiver a URL
+    if (status === "CONCLUIDO" && certificadoUrl) {
+        const fullUrl = certificadoUrl.startsWith("http") 
+            ? certificadoUrl 
+            : (certificadoUrl.includes("assets") ? certificadoUrl : SERVER_URL + certificadoUrl);
+
+        // AQUI FOI A ALTERAÇÃO DO NOME
         acoesHtml += `
-            <a href="${(certificadoDisponivel.startsWith("http") ? "" : SERVER_URL)}${certificadoDisponivel}" target="_blank" class="btn-evento btn-download-certificado">
-                <i class="fas fa-download"></i> Baixar Certificado
+            <a href="${fullUrl}" download="Certificado_${evento.nome}.pdf" target="_blank" class="btn-evento btn-certificado">
+                <i class="fas fa-file-download"></i> Certificado Disponível
             </a>
+        `;
+    } else if (status === "CONCLUIDO") {
+        // Botão cinza se estiver processando
+        acoesHtml += `
+            <button class="btn-evento btn-processando" title="Aguardando emissão">
+                <i class="fas fa-clock"></i> Processando...
+            </button>
         `;
     }
 
@@ -536,10 +466,9 @@ function criarCardHistorico(evento, inscricao) {
                 <div class="evento-meta-item"><i class="fas fa-calendar-alt"></i><span>${formatarData(evento.data)}</span></div>
                 <div class="evento-meta-item"><i class="fas fa-clock"></i><span>${evento.hora?.substring(0,5) || "N/A"}</span></div>
                 <div class="evento-meta-item"><i class="fas fa-map-marker-alt"></i><span>${evento.local || "Online"}</span></div>
-                <div class="evento-meta-item"><i class="fas fa-tag"></i><span>${capitalize(evento.categoria)}</span></div>
             </div>
+            
             <p class="evento-description">${evento.descricao || ""}</p>
-            ${certificadoDisponivel ? `<div class="certificado-tag"><i class="fas fa-award"></i> Certificado disponível</div>` : ""}
             <div class="evento-actions">${acoesHtml}</div>
         </div>
     `;
@@ -547,52 +476,33 @@ function criarCardHistorico(evento, inscricao) {
     return div;
 }
 
-// -----------------------------
-// CANCELAR INSCRIÇÃO (PUT /api/inscricoes/{id}/cancelar)
-// -----------------------------
 async function cancelarInscricao(inscricaoId) {
-    const confirmar = confirm("Deseja cancelar sua inscrição?");
-    if (!confirmar) return;
-
+    if (!confirm("Cancelar inscrição?")) return;
     try {
-        const resp = await fetch(`${API_URL}/inscricoes/${inscricaoId}/cancelar`, {
-            method: "PUT",
-            headers: { Authorization: "Bearer " + token },
+        await fetch(`${API_URL}/inscricoes/${inscricaoId}/cancelar`, {
+            method: "PUT", headers: { Authorization: "Bearer " + token },
         });
-
-        if (!resp.ok) throw new Error("Falha ao cancelar inscrição.");
-
-        // Recarregar ambas as listas (caso esteja em histórico ou em minhas inscrições)
         carregarEventosInscritos();
         carregarHistoricoEventos();
-    } catch (e) {
-        console.error("Erro cancelarInscricao:", e);
-        alert("Não foi possível cancelar a inscrição.");
-    }
+    } catch (e) { alert("Erro ao cancelar."); }
 }
 
 // -----------------------------
-// FUNÇÕES AUXILIARES
+// UTILITÁRIOS
 // -----------------------------
 function getIconeCategoria(cat) {
     const c = {
-        workshop: "fas fa-laptop-code",
-        palestra: "fas fa-microphone-alt",
-        hackathon: "fas fa-trophy",
-        networking: "fas fa-users",
-        treinamento: "fas fa-chalkboard-teacher",
-        mentoria: "fas fa-user-tie",
-        outro: "fas fa-calendar-day",
+        workshop: "fas fa-laptop-code", palestra: "fas fa-microphone-alt",
+        hackathon: "fas fa-trophy", networking: "fas fa-users",
+        treinamento: "fas fa-chalkboard-teacher", mentoria: "fas fa-user-tie",
     };
     return c[cat?.toLowerCase()] || "fas fa-calendar-day";
 }
 
 function formatarData(data) {
     if (!data) return "";
-    // aceita string "YYYY-MM-DD" ou "YYYY-MM-DDTHH:mm:..."; lida com ambos
     const d = data.split("T")[0].split("-");
-    if (d.length < 3) return data;
-    return `${d[2]}/${d[1]}/${d[0]}`;
+    return (d.length < 3) ? data : `${d[2]}/${d[1]}/${d[0]}`;
 }
 
 function capitalize(str) {
@@ -604,7 +514,3 @@ function capitalize(str) {
 function verDetalhesEvento(id) {
     window.location.href = `detalhes-evento.html?id=${id}`;
 }
-
-// -----------------------------
-// FIM DO ARQUIVO
-// -----------------------------

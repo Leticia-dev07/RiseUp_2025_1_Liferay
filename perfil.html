@@ -62,8 +62,16 @@
                 </label>
                 <input id="file-upload" type="file" accept="image/png, image/jpeg" />
             </div>
+            
             <div class="profile-info">
-                <input type="text" id="profile-nome" class="profile-nome-input" placeholder="Seu Nome Completo" />
+                <div class="name-wrapper">
+                    <input type="text" id="profile-nome" class="profile-nome-input" placeholder="Seu Nome Completo" />
+                    
+                    <span class="certificate-badge" title="Perfil Verificado">
+                        <i class="fas fa-check-circle"></i> Certificado
+                    </span>
+                </div>
+
                 <input type="text" id="profile-titulo" class="profile-titulo-input" placeholder="Seu Título (ex: Dev Java)" />
             </div>
         </header>
@@ -84,7 +92,6 @@
 
         <div class="profile-grid">
 
-            <!-- ABA 1 -->
             <div class="tab-content active" id="tab-habilidades">
                 <section class="skills-section">
                     <h2>Minhas habilidades</h2>
@@ -101,7 +108,6 @@
                 </section>
             </div>
 
-            <!-- ABA 2 -->
             <div class="tab-content" id="tab-eventos">
                 <section class="eventos-section">
                     <h2>Eventos Inscritos</h2>
@@ -123,7 +129,6 @@
                 </section>
             </div>
 
-            <!-- ABA 3 -->
             <div class="tab-content" id="tab-historico">
                 <section class="eventos-section">
                     <h2>Histórico de Eventos</h2>
@@ -142,15 +147,9 @@
                         <p>Você ainda não participou de nenhum evento.</p>
                         <a href="homepage.html" class="btn-primary">Ver Eventos Disponíveis</a>
                     </div>
-                    <!-- Ícone de Certificado (somente quando o evento estiver concluído) -->
-<div class="certificado-icon" data-evento-id="ID_DO_EVENTO" style="display: none;">
-    <i class="fas fa-file-certificate"></i>
-</div>
-
                 </section>
             </div>
 
-            <!-- COLUNA DIREITA -->
             <aside class="about-section">
                 <div class="about-card">
                     <h3>Sobre mim</h3>

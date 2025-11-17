@@ -1,150 +1,178 @@
 let eventoAtual = null;
 
-document.addEventListener('DOMContentLoaded', function () {
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    const eventoId = urlParams.get('id');
+document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventoId = urlParams.get("id");
 
-    if (eventoId) {
-        carregarDetalhesEvento(eventoId);
-    } else {
-        mostrarErro('ID do evento não fornecido.');
-    }
+    if (!eventoId) {
+        mostrarErro("ID do evento não fornecido.");
+        return;
+    }
+
+    carregarDetalhesEvento(eventoId);
 });
 
+/* =======================================================
+   1) CARREGAR DETALHES DO EVENTO
+======================================================= */
 async function carregarDetalhesEvento(eventoId) {
-    try {
-        const response = await fetch(`${API_URL}/eventos/${eventoId}`, {
-            method: 'GET',
-            headers: { "Authorization": "Bearer " + token }
-        });
+    try {
+        const response = await fetch(`${API_URL}/eventos/${eventoId}`, {
+            method: "GET",
+            headers: { "Authorization": "Bearer " + token }
+        });
 
-        if (response.status === 401 || response.status === 403) {
-            alert("Sua sessão expirou. Faça login novamente.");
-            localStorage.removeItem("authToken");
-            window.location.href = "login.html";
-            return;
-        }
-        if (!response.ok) throw new Error('Erro ao buscar evento.');
-
-        eventoAtual = await response.json();
-        preencherDetalhesEvento(eventoAtual);
-        
-        verificarStatusInscricao(eventoId); 
-    } catch (erro) {
-        console.error('Erro ao carregar evento:', erro);
-        mostrarErro('Erro ao carregar evento.');
-    }
-}
-
-async function verificarStatusInscricao(eventoId) {
-    try {
-        const response = await fetch(`${API_URL}/eventos/${eventoId}/status`, {
-            method: 'GET',
-            headers: { "Authorization": "Bearer " + token }
-        });
-
-        if (response.ok) {
-            const status = await response.json();
-            atualizarBotaoInscricao(status);
-        }
-    } catch (erro) {
-        console.error('Erro ao verificar inscrição:', erro);
-    }
-}
-
-async function inscreverEvento() {
-    const btn = document.getElementById('inscricaoBtn');
-    const msg = document.getElementById('statusMessage');
-    btn.disabled = true;
-
-    try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const eventoId = urlParams.get('id');
-
-        const response = await fetch(`${API_URL}/eventos/${eventoId}/inscrever`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                "Authorization": "Bearer " + token
-            },
-        });
-        
-        if (!response.ok) {
-             const resultadoErro = await response.json();
-             throw new Error(resultadoErro.erro || 'Erro desconhecido');
-        }
-        
-        mostrarConfirmacaoInscricao(eventoAtual);
-        
-    } catch (erro) {
-        console.error('Erro na inscrição:', erro);
-        msg.textContent = `Erro: ${erro.message}`; 
-        btn.disabled = false;
-    }
-}
-
-function preencherDetalhesEvento(evento) {
-    document.getElementById('eventName').textContent = evento.nome;
-    document.getElementById('eventDescription').textContent = evento.descricao;
-    document.getElementById('eventDate').textContent = formatarData(evento.data);
-    document.getElementById('eventTime').textContent = evento.hora.substring(0, 5);
-    document.getElementById('eventLocation').textContent = evento.local;
-    document.getElementById('eventCategory').textContent = evento.categoria || '-';
-    
-    const vagasElement = document.getElementById('eventVagas');
-    if (vagasElement) {
-        const vagas = evento.vagas; 
-        vagasElement.textContent = (vagas !== undefined && vagas >= 0) ? `${vagas} vagas` : '- vagas';
-    }
-}
-
-function atualizarBotaoInscricao(status) {
-    const btn = document.getElementById('inscricaoBtn');
-    const msg = document.getElementById('statusMessage');
-
-	const btnText = btn.querySelector('span');
-	const textTarget = btnText || btn;
-
-    if (status.jaInscrito) {
-        textTarget.textContent = 'Já Inscrito';
-        btn.disabled = true;
-        msg.textContent = 'Você já está inscrito neste evento.';
-    } else if (status.esgotado) {
-        textTarget.textContent = 'Vagas Esgotadas';
-        btn.disabled = true;
-        msg.textContent = 'Vagas esgotadas.';
-    } else {
-        textTarget.textContent = 'Inscrever-se';
-        btn.disabled = false;
-        if(btn.hasAttribute('onclick')) {
-            btn.removeAttribute('onclick');
+        if (response.status === 401 || response.status === 403) {
+            alert("Sua sessão expirou. Faça login novamente.");
+            localStorage.removeItem("authToken");
+            window.location.href = "login.html";
+            return;
         }
-        btn.addEventListener('click', inscreverEvento); 
-        msg.textContent = '';
-    }
+
+        if (!response.ok) throw new Error("Erro ao carregar evento.");
+
+        eventoAtual = await response.json();
+        preencherDetalhesEvento(eventoAtual);
+
+        // AGORA CHAMA O ENDPOINT CERTO
+        verificarStatusInscricao(eventoId);
+
+    } catch (erro) {
+        console.error("Erro ao carregar evento:", erro);
+        mostrarErro("Erro ao carregar evento.");
+    }
 }
 
+/* =======================================================
+   2) CHECAR STATUS DA INSCRIÇÃO
+======================================================= */
+async function verificarStatusInscricao(eventoId) {
+    try {
+        const response = await fetch(`${API_URL}/inscricoes/eventos/${eventoId}/status`, {
+            method: "GET",
+            headers: { "Authorization": "Bearer " + token }
+        });
+
+        if (!response.ok) return;
+
+        const status = await response.json();
+        atualizarBotaoInscricao(status);
+
+    } catch (erro) {
+        console.error("Erro ao verificar inscrição:", erro);
+    }
+}
+
+/* =======================================================
+   3) INSCREVER NO EVENTO
+======================================================= */
+async function inscreverEvento() {
+    const btn = document.getElementById("inscricaoBtn");
+    const msg = document.getElementById("statusMessage");
+    btn.disabled = true;
+
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventoId = urlParams.get("id");
+
+        const response = await fetch(`${API_URL}/inscricoes/eventos/${eventoId}/inscrever`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            }
+        });
+
+        if (!response.ok) {
+            const erro = await response.json();
+            throw new Error(erro.erro || "Erro ao se inscrever.");
+        }
+
+        mostrarConfirmacaoInscricao(eventoAtual);
+
+    } catch (erro) {
+        msg.textContent = "Erro: " + erro.message;
+        console.error("Erro inscrição:", erro);
+        btn.disabled = false;
+    }
+}
+
+/* =======================================================
+   4) PREENCHER TELA COM O EVENTO
+======================================================= */
+function preencherDetalhesEvento(evento) {
+    document.getElementById("eventName").textContent = evento.nome;
+    document.getElementById("eventDescription").textContent = evento.descricao;
+    document.getElementById("eventDate").textContent = formatarData(evento.data);
+    document.getElementById("eventTime").textContent = evento.hora?.substring(0, 5) || "--:--";
+    document.getElementById("eventLocation").textContent = evento.local;
+    document.getElementById("eventCategory").textContent = evento.categoria || "-";
+
+    const vagasElem = document.getElementById("eventVagas");
+    if (vagasElem) {
+        vagasElem.textContent = 
+            evento.vagas != null ? `${evento.vagas} vagas` : "- vagas";
+    }
+}
+
+/* =======================================================
+   5) ATUALIZAR BOTÃO
+======================================================= */
+function atualizarBotaoInscricao(status) {
+    const btn = document.getElementById("inscricaoBtn");
+    const msg = document.getElementById("statusMessage");
+
+    // remove listeners duplicados
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+
+    if (status.inscrito) {
+        newBtn.querySelector("span").textContent = "Já Inscrito";
+        newBtn.disabled = true;
+        msg.textContent = "Você já está inscrito neste evento.";
+        return;
+    }
+
+    if (eventoAtual.vagas <= 0) {
+        newBtn.querySelector("span").textContent = "Vagas Esgotadas";
+        newBtn.disabled = true;
+        msg.textContent = "Vagas esgotadas.";
+        return;
+    }
+
+    // botão normal
+    newBtn.querySelector("span").textContent = "Inscrever-se";
+    newBtn.disabled = false;
+    msg.textContent = "";
+
+    newBtn.addEventListener("click", inscreverEvento);
+}
+
+/* =======================================================
+   6) CONFIRMAÇÃO
+======================================================= */
 function mostrarConfirmacaoInscricao(evento) {
-    localStorage.setItem('inscricaoRealizada', JSON.stringify({
-        eventoNome: evento.nome,
-        eventoData: formatarData(evento.data),
-        eventoHora: evento.hora.substring(0, 5),
-        eventoLocal: evento.local
-    }));
-    window.location.href = 'inscricao-confirmacao.html';
+    localStorage.setItem("inscricaoRealizada", JSON.stringify({
+        eventoNome: evento.nome,
+        eventoData: formatarData(evento.data),
+        eventoHora: evento.hora?.substring(0, 5),
+        eventoLocal: evento.local
+    }));
+
+    window.location.href = "inscricao-confirmacao.html";
 }
 
+/* =======================================================
+   7) UTILITÁRIOS
+======================================================= */
 function formatarData(data) {
-    if (!data) return "--/--/----";
-    const partes = data.split('-');
-    if (partes.length < 3) return data;
-    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    if (!data) return "--/--/----";
+    const p = data.split("-");
+    return `${p[2]}/${p[1]}/${p[0]}`;
 }
 
-function mostrarErro(mensagem) {
-    document.getElementById('eventName').textContent = 'Erro';
-    document.getElementById('eventDescription').textContent = mensagem;
-    const btn = document.getElementById('inscricaoBtn');
-    if (btn) btn.style.display = 'none';
+function mostrarErro(msg) {
+    document.getElementById("eventName").textContent = "Erro";
+    document.getElementById("eventDescription").textContent = msg;
+    document.getElementById("inscricaoBtn").style.display = "none";
 }

@@ -20,7 +20,7 @@ body {
   font-family: 'Source Sans Pro', sans-serif;
   background-color: var(--cor-branco);
   height: 100vh;
-  display: flex; /* troque grid por flex */
+  display: flex;
   flex-direction: column;
   overflow: hidden;
 }
@@ -115,16 +115,14 @@ body {
   font-size: 16px;
 }
 
-
-
 /* --- 3. Conteúdo Principal --- */
 .main-content {
   grid-row: 2;
   overflow-y: auto;
-  padding: 40px 0; /* remove padding lateral */
+  padding: 40px 0;
   display: flex;
   flex-direction: column;
-  align-items: center; /* centraliza as seções */
+  align-items: center;
 }
 
 .content-section {
@@ -143,23 +141,22 @@ body {
 .carousel {
   position: relative;
   display: flex;
-  justify-content: center; /* Centraliza o conteúdo */
+  justify-content: center;
   align-items: center;
   width: 100%;
 }
 
-/* --- GARANTE O CONTEXTO DE POSICIONAMENTO --- */
 .carousel-viewport {
-  position: relative; /* Necessário para posicionar as arrows */
+  position: relative;
   overflow: hidden;
   max-width: 1200px;
   margin: 0 auto;
 }
 
 .carousel-track {
-  display: flex; /* Coloca os slides em linha */
-  gap: 30px; /* Espaço entre os cards */
-  transition: transform 0.5s ease-in-out; /* Animação de slide */
+  display: flex;
+  gap: 30px;
+  transition: transform 0.5s ease-in-out;
 }
 
 /* --- BOTÕES (ARROWS) DO CARROSSEL --- */
@@ -183,32 +180,30 @@ body {
   justify-content: center;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
-/* Efeito ao passar o mouse */
+
 .carousel-arrow:hover {
   opacity: 1;
   transform: translateY(-50%) scale(1.1);
 }
 
-/* Estado desativado */
 .carousel-arrow:disabled {
   opacity: 0.3;
   cursor: not-allowed;
   transform: translateY(-50%) scale(1);
 }
 
-/* Ajuste de posição lateral */
 .carousel-arrow.prev {
-  left: -70px; /* Afastado do card */
+  left: -70px;
 }
 
 .carousel-arrow.next {
-  right: -50px; /* Afastado do card */
+  right: -50px;
 }
 
 .card {
   width: 370px; 
   text-align: center;
-  flex-shrink: 0; /* Impede que os cards encolham */
+  flex-shrink: 0;
 }
 
 .card img {
@@ -248,6 +243,7 @@ body {
   background: var(--cor-principal);
 }
 
+/* --- RESULTADOS DA PESQUISA GLOBAL --- */
 #global-search-results {
   display: none;
   position: absolute;
@@ -317,38 +313,7 @@ body {
   transform: translateX(2px);
 }
 
-#global-search-results a::before {
-  content: attr(data-initials);
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--cor-principal, #00318F), #0056b3);
-  color: white;
-  font-size: 18px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0, 49, 143, 0.2);
-  text-transform: uppercase;
-}
-
-#global-search-results a::after {
-  content: '\f061';
-  font-family: 'Font Awesome 5 Free';
-  font-weight: 900;
-  color: var(--cor-texto-claro, #BDBDC7);
-  font-size: 16px;
-  margin-left: auto;
-  opacity: 0;
-  transition: all 0.2s ease;
-}
-
-#global-search-results a:hover::after {
-  opacity: 1;
-  transform: translateX(4px);
-}
+/* --- AQUI REMOVEMOS A BOLINHA AZUL (::before e ::after) --- */
 
 #global-search-results a strong {
   display: block;
@@ -365,6 +330,7 @@ body {
   font-weight: 400;
 }
 
+/* Estilo para a Badge (se usada) */
 #global-search-results a .badge {
   padding: 4px 10px;
   background: var(--cor-fundo-claro, #F4F4F6);
@@ -382,12 +348,6 @@ body {
     border-radius: 8px;
   }
 
-  #global-search-results a::before {
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
-  }
-
   #global-search-results a strong {
     font-size: 15px;
   }
@@ -396,4 +356,3 @@ body {
     font-size: 13px;
   }
 }
-

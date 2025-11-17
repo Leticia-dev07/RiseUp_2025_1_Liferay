@@ -259,6 +259,7 @@ body {
     }
 }
 
+/* --- RESULTADOS DA PESQUISA GLOBAL (CORRIGIDO) --- */
 #global-search-results {
   display: none;
   position: absolute;
@@ -328,38 +329,9 @@ body {
   transform: translateX(2px);
 }
 
-#global-search-results a::before {
-  content: attr(data-initials);
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--cor-principal, #00318F), #0056b3);
-  color: white;
-  font-size: 18px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0, 49, 143, 0.2);
-  text-transform: uppercase;
-}
-
-#global-search-results a::after {
-  content: '\f061';
-  font-family: 'Font Awesome 5 Free';
-  font-weight: 900;
-  color: var(--cor-texto-claro, #BDBDC7);
-  font-size: 16px;
-  margin-left: auto;
-  opacity: 0;
-  transition: all 0.2s ease;
-}
-
-#global-search-results a:hover::after {
-  opacity: 1;
-  transform: translateX(4px);
-}
+/* REMOVIDO: a::before (Bolinha Azul) 
+REMOVIDO: a::after (Setinha) 
+*/
 
 #global-search-results a strong {
   display: block;
@@ -393,11 +365,7 @@ body {
     border-radius: 8px;
   }
 
-  #global-search-results a::before {
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
-  }
+  /* REMOVIDO: a::before (Bolinha Azul) do mobile */
 
   #global-search-results a strong {
     font-size: 15px;

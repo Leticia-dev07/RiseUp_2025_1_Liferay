@@ -1,80 +1,65 @@
 // ===============================================
-// ARQUIVO: global.js (O "CHEFE")
+// ARQUIVO: global.js (VERSÃO FINAL INTEGRADA)
 // ===============================================
 
 // 1. Definições globais
 const API_URL = "http://localhost:8080/api";
 const SERVER_URL = "http://localhost:8080";
-const token = localStorage.getItem("authToken");
 
-// 2. Verificação de segurança global
-// Se não tiver token E não estiver na página de login, manda pro login.
+// Tenta pegar o token (verifica ambos os nomes comuns para garantir)
+const token = localStorage.getItem("token") || localStorage.getItem("authToken");
+
+// 2. Verificação de segurança (Redireciona se não tiver logado)
 if (!token && !window.location.pathname.endsWith('login.html') && !window.location.pathname.endsWith('criar-conta.html')) {
-    alert("Você precisa estar logado para ver esta página.");
-    window.location.href = "login.html"; 
+    // Descomente a linha abaixo quando quiser bloquear o acesso não autorizado
+    // window.location.href = "login.html"; 
 }
 
 // =====================
-// FUNÇÕES GLOBAIS
+// 1. CARREGAR DADOS DO CABEÇALHO (FOTO E NOME)
 // =====================
-
-/**
- * Carrega os dados do usuário (nome e foto) no header.
- * Procura por:
- * <img id="header-profile-pic" ...>
- * <span id="header-profile-name">...</span>
- */
 async function carregarDadosUsuario() {
-    if (!token) return; // Sai se não tiver token
+    if (!token) return; 
 
-    const PROFILE_API_URL = `${API_URL}/perfis/me`;
-    const userImage = document.getElementById("header-profile-pic"); 
-    const userNameSpan = document.getElementById("header-profile-name");
+    try {
+        const response = await fetch(`${API_URL}/perfis/me`, {
+            method: "GET",
+            headers: { Authorization: "Bearer " + token },
+        });
 
-    // Se não achar os elementos no header, não faz nada.
-    if (!userImage || !userNameSpan) {
-        console.warn("Elementos do perfil no header (header-profile-pic ou header-profile-name) não encontrados.");
-        return;
-    }
+        if (!response.ok) return;
 
-    try {
-        const response = await fetch(PROFILE_API_URL, {
-            method: "GET",
-            headers: { Authorization: "Bearer " + token },
-        });
+        const perfil = await response.json();
+        
+        // Elementos do HTML do Header
+        const userImage = document.getElementById("header-profile-pic"); 
+        const userNameSpan = document.getElementById("header-profile-name");
 
-        if (!response.ok) {
-            console.error("Sessão expirada ou falha ao buscar perfil.");
-            if (response.status === 401 || response.status === 403) {
-                 localStorage.removeItem("authToken");
-                 window.location.href = "login.html";
-            }
-            return;
+        // Preenche Nome
+        if (userNameSpan && perfil.nomeCompleto) {
+            userNameSpan.textContent = perfil.nomeCompleto;
         }
 
-        const perfil = await response.json();
-
-        if (perfil.nomeCompleto && userNameSpan) {
-            userNameSpan.textContent = perfil.nomeCompleto;
-        }
-        if (perfil.fotoPerfilUrl && userImage) {
-            userImage.src = SERVER_URL + perfil.fotoPerfilUrl;
-        }
-    } catch (error) {
-        console.error("Erro ao carregar dados do usuário:", error);
-    }
+        // Preenche Foto
+        if (userImage && perfil.fotoPerfilUrl) {
+            userImage.src = perfil.fotoPerfilUrl.startsWith("http") 
+                ? perfil.fotoPerfilUrl 
+                : SERVER_URL + perfil.fotoPerfilUrl;
+        }
+    } catch (error) {
+        console.error("Erro ao carregar header:", error);
+    }
 }
 
-/**
- * Configura o botão de logout (se existir na página).
- */
+// =====================
+// 2. CONFIGURAR LOGOUT
+// =====================
 function setupLogout() {
-    // Você mencionou um botão de logout, mas ele não está no HTML que vi.
-    // Se você tiver um <button id="logout-button">, isto vai funcionar.
-    const logoutButton = document.getElementById("logout-button");
+    const logoutButton = document.getElementById("logout-button"); // Se existir um botão com esse ID
     if (logoutButton) {
         logoutButton.addEventListener("click", (e) => {
             e.preventDefault();
+            localStorage.removeItem("token");
             localStorage.removeItem("authToken");
             alert("Você saiu da sua conta.");
             window.location.href = "login.html";
@@ -82,33 +67,27 @@ function setupLogout() {
     }
 }
 
-/**
- * Configura a barra de pesquisa global com autocomplete.
- * Procura por:
- * <input id="search-input" ...>
- * <div id="global-search-results">...</div>
- */
+// =====================
+// 3. BARRA DE PESQUISA GLOBAL (COM FOTOS)
+// =====================
 function setupGlobalSearch() {
     const searchInput = document.getElementById("search-input");
     const resultsContainer = document.getElementById("global-search-results");
 
-    if (!searchInput || !resultsContainer) {
-        console.warn("Elementos da busca global (search-input ou global-search-results) não encontrados.");
-        return;
-    }
+    if (!searchInput || !resultsContainer) return;
 
+    // Função de atraso para não chamar a API a cada letra (Debounce)
     const debounce = (func, delay) => {
         let timeoutId;
         return (...args) => {
             clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => {
-                func.apply(this, args);
-            }, delay);
+            timeoutId = setTimeout(() => func.apply(this, args), delay);
         };
     };
 
+    // Função que chama a API
     const fetchResults = async (query) => {
-        if (query.length < 2) { // Não busca por menos de 2 caracteres
+        if (query.length < 2) { 
             resultsContainer.style.display = "none";
             return;
         }
@@ -116,6 +95,7 @@ function setupGlobalSearch() {
             const response = await fetch(`${API_URL}/perfis/buscar?q=${encodeURIComponent(query)}`, {
                 headers: { 'Authorization': 'Bearer ' + token }
             });
+            
             if (!response.ok) throw new Error('Erro na busca');
             
             const data = await response.json();
@@ -123,39 +103,87 @@ function setupGlobalSearch() {
 
         } catch (error) {
             console.error('Falha na busca:', error);
-            resultsContainer.innerHTML = '<div style="padding:10px; color: #777;">Erro ao buscar.</div>';
-            resultsContainer.style.display = 'block';
+            resultsContainer.style.display = 'none';
         }
     };
 
+    // Função que desenha os resultados na tela
     const renderResults = (results) => {
-        if (results.length === 0) {
-            resultsContainer.innerHTML = '<div style="padding:10px; color: #777;">Nenhum resultado encontrado.</div>';
+        resultsContainer.innerHTML = ""; 
+
+        if (!results || results.length === 0) {
+            resultsContainer.innerHTML = '<div style="padding:10px; color:#777; text-align:center;">Nenhum resultado encontrado.</div>';
             resultsContainer.style.display = 'block';
             return;
         }
 
-        resultsContainer.innerHTML = ""; // Limpa resultados antigos
-
         results.forEach(item => {
-            const linkElement = document.createElement('a');
-            // A URL vem pronta do backend (ex: /web/jorge-antonio/perfil?usuarioId=1)
-            linkElement.href = item.urlPerfil; 
-            linkElement.innerHTML = `
-                <strong>${item.nome}</strong>
-                <span>${item.descricao}</span>
+            // Tenta encontrar a URL da foto em vários campos possíveis
+            const fotoBanco = item.fotoPerfilUrl || item.fotoUrl || item.urlPerfil; 
+            
+            let fotoFinal = "assets/pictures/profile-pic.png"; // Imagem padrão
+
+            // Se tiver foto, ajusta o caminho
+            if (fotoBanco && fotoBanco.length > 5) { // Checagem simples se não é string vazia
+                fotoFinal = fotoBanco.startsWith("http") 
+                    ? fotoBanco 
+                    : SERVER_URL + fotoBanco;
+            }
+
+            // Cria o link do resultado
+            const link = document.createElement('a');
+            
+            // Define para onde vai ao clicar (Perfil ou Evento)
+            // Se o DTO tiver 'urlPerfil' (como ajustamos no Java), usa ele. Senão, tenta montar manualmente.
+            if (item.urlPerfil && item.urlPerfil.includes(".html")) {
+                link.href = item.urlPerfil;
+            } else {
+                // Fallback: assume que é um usuário
+                link.href = `perfil.html?usuarioId=${item.id || item.usuarioId}`;
+            }
+            
+            // Estilo CSS inline para garantir o layout
+            link.style.cssText = `
+                display: flex; 
+                align-items: center; 
+                padding: 10px 15px; 
+                border-bottom: 1px solid #eee; 
+                text-decoration: none; 
+                color: #333; 
+                cursor: pointer;
+                background: #fff;
+                transition: background 0.2s;
             `;
-            resultsContainer.appendChild(linkElement);
+            
+            // HTML interno do item (Foto + Texto)
+            link.innerHTML = `
+                <img src="${fotoFinal}" 
+                     alt="${item.nome}" 
+                     style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 12px; border: 1px solid #ddd;"
+                     onerror="this.src='assets/pictures/profile-pic.png'">
+                
+                <div style="display: flex; flex-direction: column;">
+                    <strong style="font-size: 14px;">${item.nome}</strong>
+                    <span style="font-size: 12px; color: #777;">${item.titulo || item.descricao || 'Membro'}</span>
+                </div>
+            `;
+            
+            // Efeitos de Hover
+            link.onmouseover = () => link.style.background = "#f9f9f9";
+            link.onmouseout = () => link.style.background = "#fff";
+
+            resultsContainer.appendChild(link);
         });
+        
         resultsContainer.style.display = 'block';
     };
 
-    // "Ouve" a digitação, com delay
+    // Evento de digitação
     searchInput.addEventListener('input', debounce((e) => {
         fetchResults(e.target.value);
     }, 300));
 
-    // Fecha o dropdown se clicar fora
+    // Fechar dropdown ao clicar fora
     document.addEventListener('click', (e) => {
         if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
             resultsContainer.style.display = 'none';
@@ -163,11 +191,10 @@ function setupGlobalSearch() {
     });
 }
 
-// ===============================================
-// INICIALIZAÇÃO GLOBAL (LIGA TUDO)
-// ===============================================
+// =====================
+// INICIALIZAÇÃO
+// =====================
 document.addEventListener("DOMContentLoaded", () => {
-    // Roda em TODAS as páginas que importarem este script
     carregarDadosUsuario();
     setupLogout();
     setupGlobalSearch();

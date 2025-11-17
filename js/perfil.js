@@ -1,15 +1,16 @@
 // ===============================================
-// ARQUIVO: perfil.js (ATUALIZADO)
+// ARQUIVO: perfil.js (COMPLETO E ATUALIZADO)
 // ===============================================
 
-// Variáveis globais esperadas:
-// - API_URL
-// - SERVER_URL
-// - token
+// -----------------------------
+// CONFIGURAÇÕES GLOBAIS
+// -----------------------------
+// As variáveis API_URL, SERVER_URL e token devem vir do global.js
+// Se não estiverem lá, descomente abaixo:
+// const API_URL = "http://localhost:8080/api"; 
+// const SERVER_URL = "http://localhost:8080";
+// const token = localStorage.getItem("token"); 
 
-// -----------------------------
-// CONFIGURAÇÕES INICIAIS
-// -----------------------------
 const initialSkills = ["React", "Next.js", "JavaScript", "Python"];
 
 const skillIcons = {
@@ -40,16 +41,18 @@ document.addEventListener("DOMContentLoaded", () => {
     initializeTabs();
 
     if (publicoUsuarioId) {
+        // Visualizando perfil público
         carregarPerfilPublico(publicoUsuarioId);
         hideEditorControls();
     } else {
+        // Meu perfil (edição)
         carregarMeuPerfilParaEdicao();
         setupEditorControls();
     }
 });
 
 // -----------------------------
-// AUX: esconder controles de edição
+// CONTROLES DE INTERFACE
 // -----------------------------
 function hideEditorControls() {
     const saveBtn = document.getElementById("save-profile-btn");
@@ -62,9 +65,6 @@ function hideEditorControls() {
     if (addSkillForm) addSkillForm.style.display = "none";
 }
 
-// -----------------------------
-// AUX: configurar controles de edição
-// -----------------------------
 function setupEditorControls() {
     const saveBtn = document.getElementById("save-profile-btn");
     if (saveBtn) saveBtn.addEventListener("click", salvarMeuPerfil);
@@ -103,7 +103,7 @@ function setupEditorControls() {
 }
 
 // -----------------------------
-// TABS
+// SISTEMA DE ABAS (TABS)
 // -----------------------------
 function initializeTabs() {
     const tabBtns = document.querySelectorAll(".tab-btn");
@@ -122,6 +122,7 @@ function initializeTabs() {
             const contentEl = document.getElementById(`tab-${targetTab}`);
             if (contentEl) contentEl.classList.add("active");
 
+            // Carregamento Lazy (apenas quando clica na aba)
             if (targetTab === "eventos") {
                 const eventosList = document.getElementById("eventos-list");
                 if (eventosList && eventosList.children.length === 0) {
@@ -138,19 +139,29 @@ function initializeTabs() {
 }
 
 // -----------------------------
-// CARREGAR PERFIL
+// CARREGAR PERFIL (API)
 // -----------------------------
 async function carregarMeuPerfilParaEdicao() {
     try {
         const resp = await fetch(`${API_URL}/perfis/me`, {
             headers: { Authorization: "Bearer " + token },
         });
+
         if (!resp.ok) throw new Error("Erro ao carregar perfil");
+
         const perfil = await resp.json();
         preencherDadosPerfil(perfil, true);
     } catch (e) {
-        console.error(e);
-        preencherDadosPerfil({ nomeCompleto: "Falha", titulo: "Erro", sobreMim: "N/A", habilidades: initialSkills }, true);
+        console.error("Erro carregarMeuPerfilParaEdicao:", e);
+        preencherDadosPerfil(
+            {
+                nomeCompleto: "Erro ao carregar",
+                titulo: "Verifique conexão",
+                sobreMim: "Não foi possível carregar os dados.",
+                habilidades: initialSkills,
+            },
+            true
+        );
     }
 }
 
@@ -159,21 +170,25 @@ async function carregarPerfilPublico(usuarioId) {
         const resp = await fetch(`${API_URL}/perfis/usuario/${usuarioId}`, {
             headers: { Authorization: "Bearer " + token },
         });
-        if (!resp.ok) throw new Error("Erro");
+
+        if (!resp.ok) throw new Error("Erro ao carregar perfil público");
+
         const perfil = await resp.json();
         preencherDadosPerfil(perfil, false);
     } catch (e) {
-        console.error(e);
-        alert("Erro ao carregar perfil.");
+        console.error("Erro carregarPerfilPublico:", e);
+        alert("Erro ao carregar o perfil do usuário.");
     }
 }
 
 function preencherDadosPerfil(perfil, modoEdicao) {
+    // Foto
     const imgPreview = document.getElementById("main-profile-pic");
     if (imgPreview && perfil.fotoPerfilUrl) {
         imgPreview.src = (perfil.fotoPerfilUrl.startsWith("http") ? "" : SERVER_URL) + perfil.fotoPerfilUrl;
     }
 
+    // Campos
     if (modoEdicao) {
         const nomeEl = document.getElementById("profile-nome");
         const tituloEl = document.getElementById("profile-titulo");
@@ -185,6 +200,7 @@ function preencherDadosPerfil(perfil, modoEdicao) {
 
         renderizarSkills(perfil.habilidades || [], true);
     } else {
+        // Modo Visualização (Substitui inputs por texto)
         const nomeInput = document.getElementById("profile-nome");
         const tituloInput = document.getElementById("profile-titulo");
         const sobreInput = document.getElementById("profile-sobre");
@@ -204,12 +220,15 @@ function criarElementoTexto(tag, texto) {
 }
 
 // -----------------------------
-// SALVAR / UPLOAD
+// SALVAR PERFIL (PUT)
 // -----------------------------
 async function salvarMeuPerfil(e) {
     e.preventDefault();
     const btn = e.target;
-    if (btn) { btn.disabled = true; btn.textContent = "Salvando..."; }
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Salvando...";
+    }
 
     const dados = {
         nomeCompleto: document.getElementById("profile-nome").value,
@@ -221,18 +240,30 @@ async function salvarMeuPerfil(e) {
     try {
         const resp = await fetch(`${API_URL}/perfis/me`, {
             method: "PUT",
-            headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + token,
+            },
             body: JSON.stringify(dados),
         });
-        if (!resp.ok) throw new Error("Erro");
-        alert("Perfil salvo!");
+
+        if (!resp.ok) throw new Error("Erro ao salvar perfil");
+
+        alert("Perfil salvo com sucesso!");
     } catch (err) {
-        alert("Erro ao salvar.");
+        console.error("Erro salvarMeuPerfil:", err);
+        alert("Não foi possível salvar o perfil.");
     } finally {
-        if (btn) { btn.disabled = false; btn.textContent = "Salvar Alterações"; }
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = "Salvar Alterações";
+        }
     }
 }
 
+// -----------------------------
+// UPLOAD DE FOTO
+// -----------------------------
 async function uploadMinhaFoto(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -249,35 +280,45 @@ async function uploadMinhaFoto(event) {
             headers: { Authorization: "Bearer " + token },
             body: formData,
         });
-        if (!resp.ok) throw new Error("Erro");
+
+        if (!resp.ok) throw new Error("Erro ao enviar foto");
+
         const data = await resp.json();
         const img = document.getElementById("main-profile-pic");
+        // Adiciona timestamp para forçar atualização do cache do navegador
         if (img) img.src = (data.novaUrl.startsWith("http") ? "" : SERVER_URL) + data.novaUrl + "?t=" + Date.now();
+
     } catch (err) {
-        alert("Erro na foto.");
+        console.error("Erro uploadMinhaFoto:", err);
+        alert("Falha ao enviar foto.");
     } finally {
         if (btn) btn.innerHTML = '<i class="fas fa-camera"></i>';
     }
 }
 
 // -----------------------------
-// SKILLS
+// GERENCIAMENTO DE SKILLS
 // -----------------------------
 function adicionarSkillDaCaixa() {
     const input = document.getElementById("skill-input");
     if (!input || !input.value.trim()) return;
+
     const list = document.getElementById("skills-list");
-    list.appendChild(createSkillElement(input.value.trim(), true));
+    const el = createSkillElement(input.value.trim(), true);
+    list.appendChild(el);
     input.value = "";
 }
 
 function createSkillElement(skillName, editavel) {
     const icon = skillIcons[skillName.toLowerCase()] || '<i class="fas fa-code" style="color:#00318f;"></i>';
+
     const div = document.createElement("div");
     div.classList.add("skill-item");
+
     div.innerHTML = `
         <div class="skill-pill">
-            ${icon} <span>${skillName}</span>
+            ${icon}
+            <span>${skillName}</span>
             ${editavel ? `<button class="delete-skill-btn"><i class="fas fa-times"></i></button>` : ""}
         </div>
     `;
@@ -288,6 +329,7 @@ function renderizarSkills(arr, editavel) {
     const list = document.getElementById("skills-list");
     if (!list) return;
     list.innerHTML = "";
+
     let skillsArray = arr;
     if (!Array.isArray(arr) && typeof arr === "string") {
         skillsArray = arr.split(",").map(s => s.trim()).filter(Boolean);
@@ -300,7 +342,7 @@ function getSkillsDaLista() {
 }
 
 // -----------------------------
-// EVENTOS E HISTÓRICO
+// EVENTOS INSCRITOS (API)
 // -----------------------------
 async function carregarEventosInscritos() {
     const loading = document.getElementById("eventos-loading");
@@ -315,21 +357,34 @@ async function carregarEventosInscritos() {
         const resp = await fetch(`${API_URL}/inscricoes/minhas-inscricoes`, {
             headers: { Authorization: "Bearer " + token },
         });
-        if (!resp.ok) throw new Error("Erro");
+
+        if (!resp.ok) throw new Error(`Status ${resp.status}`);
+
         const inscricoes = await resp.json();
-        
+
         if (loading) loading.style.display = "none";
+
         if (!inscricoes || inscricoes.length === 0) {
-            if (empty) empty.style.display = "block";
+            if (empty) {
+                empty.style.display = "block";
+                empty.querySelector("h3") && (empty.querySelector("h3").textContent = "Nenhuma inscrição");
+                empty.querySelector("p") && (empty.querySelector("p").textContent = "Você ainda não se inscreveu em nenhum evento.");
+            }
             return;
         }
+
         if (list) {
             list.style.display = "flex";
             list.innerHTML = "";
             renderizarEventos(inscricoes);
         }
     } catch (err) {
+        console.error("Erro carregarEventosInscritos:", err);
         if (loading) loading.style.display = "none";
+        if (empty) {
+            empty.style.display = "block";
+            empty.querySelector("h3") && (empty.querySelector("h3").textContent = "Erro ao carregar eventos");
+        }
     }
 }
 
@@ -337,7 +392,10 @@ function renderizarEventos(inscricoes) {
     const list = document.getElementById("eventos-list");
     if (!list) return;
     list.innerHTML = "";
-    inscricoes.forEach((i) => { if (i.evento) list.appendChild(criarCardEvento(i.evento, i)); });
+
+    inscricoes.forEach((i) => {
+        if (i.evento) list.appendChild(criarCardEvento(i.evento, i));
+    });
 }
 
 function criarCardEvento(evento, inscricao) {
@@ -346,6 +404,7 @@ function criarCardEvento(evento, inscricao) {
 
     const div = document.createElement("div");
     div.className = "evento-card";
+
     div.innerHTML = `
         <span class="evento-status ${statusClass}">${capitalize(status)}</span>
         <div class="evento-icon"><i class="${getIconeCategoria(evento.categoria)}"></i></div>
@@ -355,17 +414,23 @@ function criarCardEvento(evento, inscricao) {
                 <div class="evento-meta-item"><i class="fas fa-calendar-alt"></i><span>${formatarData(evento.data)}</span></div>
                 <div class="evento-meta-item"><i class="fas fa-clock"></i><span>${evento.hora?.substring(0, 5) || "N/A"}</span></div>
                 <div class="evento-meta-item"><i class="fas fa-map-marker-alt"></i><span>${evento.local || "Online"}</span></div>
+                <div class="evento-meta-item"><i class="fas fa-tag"></i><span>${capitalize(evento.categoria)}</span></div>
             </div>
             <p class="evento-description">${evento.descricao || ""}</p>
             <div class="evento-actions">
-                <button class="btn-evento btn-detalhes" onclick="verDetalhesEvento(${evento.id})"><i class="fas fa-eye"></i> Ver Detalhes</button>
-                ${status === "CONFIRMADA" ? `<button class="btn-evento btn-cancelar-inscricao" onclick="cancelarInscricao(${inscricao.id}, ${evento.id})"><i class="fas fa-times-circle"></i> Cancelar</button>` : ""}
+                <button class="btn-evento btn-detalhes" onclick="verDetalhesEvento(${evento.id})">
+                    <i class="fas fa-eye"></i> Ver Detalhes
+                </button>
+                ${status === "CONFIRMADA" ? `<button class="btn-evento btn-cancelar-inscricao" onclick="cancelarInscricao(${inscricao.id}, ${evento.id})"><i class="fas fa-times-circle"></i> Cancelar Inscrição</button>` : ""}
             </div>
         </div>
     `;
     return div;
 }
 
+// -----------------------------
+// HISTÓRICO DE EVENTOS (API + CERTIFICADO DINÂMICO)
+// -----------------------------
 async function carregarHistoricoEventos() {
     const loading = document.getElementById("historico-loading");
     const list = document.getElementById("historico-list");
@@ -379,21 +444,34 @@ async function carregarHistoricoEventos() {
         const resp = await fetch(`${API_URL}/inscricoes/historico`, {
             headers: { Authorization: "Bearer " + token },
         });
-        if (!resp.ok) throw new Error("Erro");
+
+        if (!resp.ok) throw new Error(`Status ${resp.status}`);
+
         const historico = await resp.json();
 
         if (loading) loading.style.display = "none";
+
         if (!historico || historico.length === 0) {
-            if (empty) empty.style.display = "block";
+            if (empty) {
+                empty.style.display = "block";
+                empty.querySelector("h3") && (empty.querySelector("h3").textContent = "Nenhum histórico disponível");
+                empty.querySelector("p") && (empty.querySelector("p").textContent = "Você ainda não participou de nenhum evento finalizado.");
+            }
             return;
         }
+
         if (list) {
             list.style.display = "flex";
             list.innerHTML = "";
             renderizarHistorico(historico);
         }
     } catch (err) {
+        console.error("Erro carregarHistoricoEventos:", err);
         if (loading) loading.style.display = "none";
+        if (empty) {
+            empty.style.display = "block";
+            empty.querySelector("h3") && (empty.querySelector("h3").textContent = "Erro ao carregar histórico");
+        }
     }
 }
 
@@ -401,31 +479,26 @@ function renderizarHistorico(historico) {
     const list = document.getElementById("historico-list");
     if (!list) return;
     list.innerHTML = "";
-    historico.forEach((i) => { if (i.evento) list.appendChild(criarCardHistorico(i.evento, i)); });
+
+    historico.forEach((i) => {
+        if (i.evento) list.appendChild(criarCardHistorico(i.evento, i));
+    });
 }
 
-// ------------------------------------------
-// FUNÇÃO ATUALIZADA: CARD DE HISTÓRICO
-// ------------------------------------------
-// ============================================================
-// SUBSTITUA ESSA FUNÇÃO NO SEU ARQUIVO JS/PERFIL.JS
-// ============================================================
-
+// ------------------------------------------------------------
+// FUNÇÃO DO CARD DE HISTÓRICO (LINKS PARA CERTIFICADO.HTML)
+// ------------------------------------------------------------
 function criarCardHistorico(evento, inscricao) {
-    // Verifica status (se não tiver, assume concluído para teste)
     const status = (inscricao && inscricao.status) ? inscricao.status.toUpperCase() : "CONCLUIDO";
     const statusClass = status.toLowerCase();
-    
-    // -------------------------------------------------------
-    // LÓGICA DO CERTIFICADO
-    // -------------------------------------------------------
-    let certificadoUrl = inscricao?.certificadoUrl;
 
-    // MODO DE TESTE: Se concluído e sem URL, usa o PDF de exemplo da pasta assets
-    if (status === "CONCLUIDO" && !certificadoUrl) {
-        certificadoUrl = "assets/certificado_exemplo.pdf"; 
-    }
-    // -------------------------------------------------------
+    // Tenta obter o nome do usuário da interface atual
+    let nomeUsuario = "Participante";
+    const inputNome = document.getElementById("profile-nome");
+    const headerNome = document.getElementById("header-profile-name");
+
+    if (inputNome && inputNome.value) nomeUsuario = inputNome.value;
+    else if (headerNome && headerNome.textContent !== "Carregando...") nomeUsuario = headerNome.textContent;
 
     let acoesHtml = `
         <button class="btn-evento btn-detalhes" onclick="verDetalhesEvento(${evento.id})">
@@ -433,24 +506,15 @@ function criarCardHistorico(evento, inscricao) {
         </button>
     `;
 
-    // Renderiza o botão se estiver concluído e tiver a URL
-    if (status === "CONCLUIDO" && certificadoUrl) {
-        const fullUrl = certificadoUrl.startsWith("http") 
-            ? certificadoUrl 
-            : (certificadoUrl.includes("assets") ? certificadoUrl : SERVER_URL + certificadoUrl);
+    // LÓGICA: Se CONCLUÍDO, gera o link para a página dinâmica HTML
+    if (status === "CONCLUIDO") {
+        // Monta a URL com Query Params
+        const urlCertificado = `certificado.html?nome=${encodeURIComponent(nomeUsuario)}&evento=${encodeURIComponent(evento.nome)}&data=${encodeURIComponent(formatarData(evento.data))}`;
 
-        // AQUI FOI A ALTERAÇÃO DO NOME
         acoesHtml += `
-            <a href="${fullUrl}" download="Certificado_${evento.nome}.pdf" target="_blank" class="btn-evento btn-certificado">
-                <i class="fas fa-file-download"></i> Certificado Disponível
+            <a href="${urlCertificado}" target="_blank" class="btn-evento btn-certificado">
+                <i class="fas fa-certificate"></i> Ver Certificado
             </a>
-        `;
-    } else if (status === "CONCLUIDO") {
-        // Botão cinza se estiver processando
-        acoesHtml += `
-            <button class="btn-evento btn-processando" title="Aguardando emissão">
-                <i class="fas fa-clock"></i> Processando...
-            </button>
         `;
     }
 
@@ -466,7 +530,10 @@ function criarCardHistorico(evento, inscricao) {
                 <div class="evento-meta-item"><i class="fas fa-calendar-alt"></i><span>${formatarData(evento.data)}</span></div>
                 <div class="evento-meta-item"><i class="fas fa-clock"></i><span>${evento.hora?.substring(0,5) || "N/A"}</span></div>
                 <div class="evento-meta-item"><i class="fas fa-map-marker-alt"></i><span>${evento.local || "Online"}</span></div>
+                <div class="evento-meta-item"><i class="fas fa-tag"></i><span>${capitalize(evento.categoria)}</span></div>
             </div>
+            
+            ${(status === "CONCLUIDO") ? `<div class="certificado-tag"><i class="fas fa-check-circle"></i> Certificado Disponível</div>` : ""}
             
             <p class="evento-description">${evento.descricao || ""}</p>
             <div class="evento-actions">${acoesHtml}</div>
@@ -476,15 +543,28 @@ function criarCardHistorico(evento, inscricao) {
     return div;
 }
 
+// -----------------------------
+// CANCELAR INSCRIÇÃO
+// -----------------------------
 async function cancelarInscricao(inscricaoId) {
-    if (!confirm("Cancelar inscrição?")) return;
+    const confirmar = confirm("Deseja cancelar sua inscrição?");
+    if (!confirmar) return;
+
     try {
-        await fetch(`${API_URL}/inscricoes/${inscricaoId}/cancelar`, {
-            method: "PUT", headers: { Authorization: "Bearer " + token },
+        const resp = await fetch(`${API_URL}/inscricoes/${inscricaoId}/cancelar`, {
+            method: "PUT",
+            headers: { Authorization: "Bearer " + token },
         });
+
+        if (!resp.ok) throw new Error("Falha ao cancelar inscrição.");
+
+        // Recarregar ambas as listas
         carregarEventosInscritos();
         carregarHistoricoEventos();
-    } catch (e) { alert("Erro ao cancelar."); }
+    } catch (e) {
+        console.error("Erro cancelarInscricao:", e);
+        alert("Não foi possível cancelar a inscrição.");
+    }
 }
 
 // -----------------------------
@@ -492,17 +572,23 @@ async function cancelarInscricao(inscricaoId) {
 // -----------------------------
 function getIconeCategoria(cat) {
     const c = {
-        workshop: "fas fa-laptop-code", palestra: "fas fa-microphone-alt",
-        hackathon: "fas fa-trophy", networking: "fas fa-users",
-        treinamento: "fas fa-chalkboard-teacher", mentoria: "fas fa-user-tie",
+        workshop: "fas fa-laptop-code",
+        palestra: "fas fa-microphone-alt",
+        hackathon: "fas fa-trophy",
+        networking: "fas fa-users",
+        treinamento: "fas fa-chalkboard-teacher",
+        mentoria: "fas fa-user-tie",
+        outro: "fas fa-calendar-day",
     };
     return c[cat?.toLowerCase()] || "fas fa-calendar-day";
 }
 
 function formatarData(data) {
     if (!data) return "";
+    // aceita string "YYYY-MM-DD" ou "YYYY-MM-DDTHH:mm:..."
     const d = data.split("T")[0].split("-");
-    return (d.length < 3) ? data : `${d[2]}/${d[1]}/${d[0]}`;
+    if (d.length < 3) return data;
+    return `${d[2]}/${d[1]}/${d[0]}`;
 }
 
 function capitalize(str) {
@@ -514,3 +600,7 @@ function capitalize(str) {
 function verDetalhesEvento(id) {
     window.location.href = `detalhes-evento.html?id=${id}`;
 }
+
+// -----------------------------
+// FIM DO ARQUIVO
+// -----------------------------

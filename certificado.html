@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificado de Conclusão</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* RESET BÁSICO */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: #333333 !important; /* Fundo Cinza Escuro */
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* PAPEL DO CERTIFICADO */
+        .certificado-container {
+            background-color: #ffffff !important; /* Papel Branco */
+            width: 100%;
+            max-width: 950px;
+            height: 650px;
+            padding: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            position: relative;
+            color: #333;
+        }
+
+        /* BORDA AZUL GROSSA */
+        .borda-externa {
+            border: 8px solid #00318f !important; /* Azul Liferay */
+            height: 100%;
+            padding: 5px;
+        }
+
+        /* BORDA DOURADA FINA */
+        .borda-interna {
+            border: 2px solid #daa520 !important; /* Dourado */
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background-color: #fffbf0; /* Fundo levemente creme */
+        }
+
+        /* ÍCONE DE MEDALHA */
+        .icone-top {
+            font-size: 60px;
+            color: #daa520 !important; /* Cor Dourada */
+            margin-bottom: 10px;
+        }
+
+        /* TÍTULO */
+        h1 {
+            font-size: 40px;
+            text-transform: uppercase;
+            color: #00318f !important; /* Azul Escuro */
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .subtitulo {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        /* NOME DO ALUNO (FONTE MANUSCRITA) */
+        #cert-nome {
+            font-family: 'Great Vibes', cursive;
+            font-size: 65px;
+            color: #000000 !important;
+            margin: 10px 0;
+            border-bottom: 1px solid #ccc;
+            padding: 0 50px;
+            display: inline-block;
+        }
+
+        .texto-corpo {
+            font-size: 20px;
+            color: #444;
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+
+        #cert-evento {
+            font-size: 28px;
+            font-weight: bold;
+            color: #00318f !important;
+            margin: 5px 0 15px 0;
+        }
+
+        #cert-data {
+            font-weight: bold;
+            color: #000;
+        }
+
+        /* ASSINATURAS */
+        .assinaturas {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 50px;
+        }
+
+        .assinatura-box {
+            text-align: center;
+            width: 250px;
+        }
+
+        .linha-assinatura {
+            border-top: 1px solid #333;
+            margin-bottom: 8px;
+        }
+
+        .cargo {
+            font-size: 14px;
+            color: #777;
+        }
+
+        /* RODAPÉ */
+        .footer {
+            margin-top: auto;
+            font-size: 12px;
+            color: #999;
+            padding-bottom: 10px;
+        }
+
+        /* BOTÃO DE IMPRIMIR */
+        .btn-imprimir {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            background-color: #28a745 !important; /* Verde */
+            color: white !important;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 9999;
+            transition: transform 0.2s;
+        }
+
+        .btn-imprimir:hover {
+            transform: scale(1.05);
+            background-color: #218838 !important;
+        }
+
+        /* IMPRESSÃO: Remove fundo e botão */
+        @media print {
+            body { background: none !important; padding: 0; }
+            .certificado-container { box-shadow: none; width: 100%; height: 100%; max-width: none; }
+            .btn-imprimir { display: none !important; }
+            @page { size: landscape; margin: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="certificado-container">
+        <div class="borda-externa">
+            <div class="borda-interna">
+                
+                <div class="icone-top">
+                    <i class="fas fa-award"></i>
+                </div>
+
+                <h1>Certificado de Conclusão</h1>
+                <p class="subtitulo">Certificamos que</p>
+
+                <h2 id="cert-nome">Carregando nome...</h2>
+
+                <p class="texto-corpo">
+                    concluiu com êxito sua participação no evento
+                </p>
+
+                <h3 id="cert-evento">Carregando evento...</h3>
+
+                <p class="texto-corpo">
+                    realizado em <span id="cert-data">--/--/----</span>.
+                </p>
+
+                <div class="assinaturas">
+                    <div class="assinatura-box">
+                        <div class="linha-assinatura"></div>
+                        <p><strong>CEO Liferay</strong></p>
+                        <p class="cargo">Organização</p>
+                    </div>
+                    <div class="assinatura-box">
+                        <div class="linha-assinatura"></div>
+                        <p><strong>Diretoria Acadêmica</strong></p>
+                        <p class="cargo">Coordenação</p>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    <p>Autenticidade garantida pela plataforma RiseUp.</p>
+                    <p>Código de validação: <strong id="cert-codigo">...</strong></p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-imprimir" onclick="window.print()">
+        <i class="fas fa-print"></i> Salvar PDF
+    </button>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // 1. Pega URL
+            const params = new URLSearchParams(window.location.search);
+            
+            // 2. Pega dados (ou usa padrão se estiver vazio)
+            const nome = decodeURIComponent(params.get("nome") || "Participante Visitante");
+            const evento = decodeURIComponent(params.get("evento") || "Evento de Tecnologia");
+            const data = decodeURIComponent(params.get("data") || new Date().toLocaleDateString('pt-BR'));
+
+            // 3. Coloca na tela
+            document.getElementById("cert-nome").textContent = nome;
+            document.getElementById("cert-evento").textContent = evento;
+            document.getElementById("cert-data").textContent = data;
+
+            // 4. Código aleatório
+            const cod = "CERT-" + Math.floor(Math.random() * 1000000) + "-LF";
+            document.getElementById("cert-codigo").textContent = cod;
+
+            // 5. Título da página
+            document.title = "Certificado - " + nome;
+        });
+    </script>
+
+</body>
+</html>

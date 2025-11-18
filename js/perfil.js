@@ -604,3 +604,24 @@ function verDetalhesEvento(id) {
 // -----------------------------
 // FIM DO ARQUIVO
 // -----------------------------
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Código JavaScript existente da sua página de perfil (se houver)
+    // Exemplo:
+    // const saveBtn = document.querySelector(".save-btn-top");
+    // saveBtn.addEventListener("click", () => {
+    //     alert("Alterações salvas!");
+    // });
+
+    // Adiciona funcionalidade ao botão "Contato" da seção Ajuda & Suporte
+    const contactButton = document.querySelector(".contact-btn");
+
+    if (contactButton) {
+        contactButton.addEventListener("click", () => {
+            console.log("Botão Contato clicado. Redirecionando para den.html");
+            window.location.href = "den.html"; // Redireciona para a página do formulário
+        });
+    } else {
+        console.warn("Botão 'Contato' não encontrado na página.");
+    }
+});

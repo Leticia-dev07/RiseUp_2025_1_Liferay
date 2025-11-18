@@ -38,7 +38,9 @@ body {
   border-bottom: 1px solid var(--cor-borda);
 }
 
-.logo img { height: 35px; }
+.logo img {
+  height: 35px;
+}
 
 .search-bar {
   position: relative;
@@ -89,7 +91,9 @@ body {
   border-bottom: 1px solid var(--cor-borda);
 }
 
-#global-search-results a:hover { background-color: var(--cor-fundo-claro); }
+#global-search-results a:hover {
+  background-color: var(--cor-fundo-claro);
+}
 
 .user-nav {
   display: flex;
@@ -162,8 +166,13 @@ body {
   text-align: left;
 }
 
-.profile-picture-container { position: relative; display: inline-block; }
-#file-upload { display: none; }
+.profile-picture-container {
+  position: relative;
+  display: inline-block;
+}
+#file-upload {
+  display: none;
+}
 
 .edit-icon {
   position: absolute;
@@ -194,7 +203,9 @@ body {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.profile-info { flex: 1; }
+.profile-info {
+  flex: 1;
+}
 
 /* INPUTS E NOME DO HEADER */
 .profile-info .profile-nome-input,
@@ -269,14 +280,27 @@ body {
   background: rgba(0, 49, 143, 0.08);
 }
 
-.tab-btn i { font-size: 18px; }
+.tab-btn i {
+  font-size: 18px;
+}
 
-.tab-content { display: none; animation: fadeIn 0.4s ease; }
-.tab-content.active { display: block; }
+.tab-content {
+  display: none;
+  animation: fadeIn 0.4s ease;
+}
+.tab-content.active {
+  display: block;
+}
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* GRID DE CONTEÚDO */
@@ -312,7 +336,10 @@ body {
   margin-bottom: 10px;
 }
 
-.add-skill-form .input-wrapper { display: flex; gap: 10px; }
+.add-skill-form .input-wrapper {
+  display: flex;
+  gap: 10px;
+}
 
 .add-skill-form input {
   flex-grow: 1;
@@ -340,7 +367,9 @@ body {
   transition: background-color 0.3s ease;
 }
 
-.btn-primary:hover { background-color: #00256e; }
+.btn-primary:hover {
+  background-color: #00256e;
+}
 
 .skills-list {
   display: flex;
@@ -383,7 +412,9 @@ body {
   transition: all 0.3s ease;
 }
 
-.skill-pill i { font-size: 24px; }
+.skill-pill i {
+  font-size: 24px;
+}
 
 .delete-skill-btn {
   background: none;
@@ -394,7 +425,9 @@ body {
   transition: color 0.3s ease;
 }
 
-.delete-skill-btn:hover { color: var(--cor-notificacao); }
+.delete-skill-btn:hover {
+  color: var(--cor-notificacao);
+}
 
 /* SEÇÃO DE EVENTOS */
 .eventos-section {
@@ -437,7 +470,11 @@ body {
   margin-bottom: 20px;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 .eventos-list {
   display: flex;
@@ -475,9 +512,18 @@ body {
   text-transform: uppercase;
 }
 
-.evento-status.confirmado { background: #d4edda; color: #155724; }
-.evento-status.concluido { background: #cfe2ff; color: #084298; }
-.evento-status.cancelado { background: #f8d7da; color: #721c24; }
+.evento-status.confirmado {
+  background: #d4edda;
+  color: #155724;
+}
+.evento-status.concluido {
+  background: #cfe2ff;
+  color: #084298;
+}
+.evento-status.cancelado {
+  background: #f8d7da;
+  color: #721c24;
+}
 
 .evento-icon {
   width: 70px;
@@ -515,8 +561,15 @@ body {
   color: #666;
 }
 
-.evento-meta-item { display: flex; align-items: center; gap: 6px; }
-.evento-meta-item i { color: var(--cor-principal); font-size: 15px; }
+.evento-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.evento-meta-item i {
+  color: var(--cor-principal);
+  font-size: 15px;
+}
 
 .evento-description {
   font-size: 14px;
@@ -723,7 +776,10 @@ body {
   white-space: nowrap;
 }
 
-.certificate-badge i { margin-right: 6px; font-size: 0.85rem; }
+.certificate-badge i {
+  margin-right: 6px;
+  font-size: 0.85rem;
+}
 
 /* 3. Histórico: Tag de disponibilidade */
 .certificado-tag {
@@ -743,12 +799,17 @@ body {
 
 /* MEDIA QUERIES */
 @media (max-width: 1200px) {
-  .profile-grid { grid-template-columns: 1fr; }
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 768px) {
-  .tabs { flex-direction: column; gap: 5px; }
-  
+  .tabs {
+    flex-direction: column;
+    gap: 5px;
+  }
+
   .tab-btn {
     width: 100%;
     justify-content: center;
@@ -756,32 +817,359 @@ body {
     border-left: 3px solid transparent;
     top: 0;
   }
-  
-  .tab-btn.active { border-left-color: var(--cor-principal); border-bottom: none; }
-  
-  .profile-header { flex-direction: column; text-align: center; }
-  
-  .name-wrapper { justify-content: center; }
-  
-  .evento-card { flex-direction: column; padding: 15px; }
-  
-  .evento-content { padding-right: 0; }
-  
+
+  .tab-btn.active {
+    border-left-color: var(--cor-principal);
+    border-bottom: none;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .name-wrapper {
+    justify-content: center;
+  }
+
+  .evento-card {
+    flex-direction: column;
+    padding: 15px;
+  }
+
+  .evento-content {
+    padding-right: 0;
+  }
+
   .evento-status {
     position: static;
     margin-bottom: 10px;
     display: inline-block;
   }
-  
-  .evento-actions { flex-direction: column; }
-  .btn-evento { width: 100%; justify-content: center; }
-  
-  .btn-float { bottom: 20px; right: 20px; }
+
+  .evento-actions {
+    flex-direction: column;
+  }
+  .btn-evento {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .btn-float {
+    bottom: 20px;
+    right: 20px;
+  }
 }
 
 @media (max-width: 480px) {
-  .profile-info .profile-nome-input, 
-  .name-wrapper h1 { font-size: 24px; }
-  
-  .skill-pill { font-size: 18px; padding: 10px 20px; }
+  .profile-info .profile-nome-input,
+  .name-wrapper h1 {
+    font-size: 24px;
+  }
+
+  .skill-pill {
+    font-size: 18px;
+    padding: 10px 20px;
+  }
+}
+
+/* --- Estilos do Cabeçalho (Assumindo que já está correto do den.css) --- */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9; /* Fundo cinza claro para a página */
+  margin: 0;
+  color: #333;
+  line-height: 1.5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+header {
+  background-color: #fff;
+  padding: 20px 0;
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 30px;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 24px;
+  color: #0052cc;
+}
+
+.search-bar {
+  width: 100%;
+  max-width: 350px;
+  margin-left: 25px;
+  margin-right: auto;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 14px;
+}
+
+.user-menu a,
+.user-menu span {
+  text-decoration: none;
+  color: #555;
+}
+
+.profile-picture img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-left: 20px;
+  object-fit: cover;
+}
+
+/* --- Estilos da Página de Perfil --- */
+.main-container {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 0 30px;
+}
+
+h1 {
+  color: #0052cc;
+  font-size: 32px;
+  margin-bottom: 30px;
+}
+
+/* Estilo geral para as seções (cards) */
+.card-section {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 30px;
+  margin-bottom: 20px; /* Espaço entre os cards */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Sombra suave */
+}
+
+.card-section h2 {
+  color: #333; /* Cor mais escura para títulos de seção */
+  font-size: 24px;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+/* Estilos da Seção de Conta e Foto */
+.account-photo-section {
+  display: flex;
+  flex-wrap: wrap; /* Permite que os itens quebrem a linha */
+  justify-content: space-between;
+  align-items: flex-start; /* Alinha o topo */
+  position: relative; /* Para posicionar o botão Salvar */
+}
+
+.account-details {
+  flex-basis: 55%; /* Ocupa mais espaço */
+}
+
+.photo-details {
+  flex-basis: 35%; /* Ocupa menos espaço */
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.photo-details img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 15px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  color: #333;
+}
+
+.btn-primary {
+  background-color: #0052cc;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #0041a3;
+}
+
+.btn-secondary {
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #e0e0e0;
+}
+
+.save-btn-top {
+  position: absolute; /* Posição absoluta para o botão "Salvar" superior */
+  bottom: 30px;
+  right: 30px;
+  width: auto;
+  min-width: 120px;
+}
+
+/* --- Seções Inferiores (Notificações e Ajuda & Suporte) --- */
+.bottom-sections {
+  display: flex;
+  gap: 20px; /* Espaçamento entre as duas seções */
+}
+
+.notifications-section,
+.help-support-section {
+  flex: 1; /* Faz com que ambas ocupem o mesmo espaço */
+}
+
+/* Estilos da Seção de Notificações */
+.notifications-section .switch {
+  position: relative;
+  display: inline-block;
+  width: 45px; /* Largura do switch */
+  height: 25px; /* Altura do switch */
+  margin-left: 10px; /* Espaço entre o texto e o switch */
+  vertical-align: middle; /* Alinha com o texto */
+}
+
+.notifications-section .switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.notifications-section .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.notifications-section .slider:before {
+  position: absolute;
+  content: "";
+  height: 17px; /* Altura da bolinha */
+  width: 17px; /* Largura da bolinha */
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.notifications-section input:checked + .slider {
+  background-color: #0052cc; /* Azul quando ligado */
+}
+
+.notifications-section input:focus + .slider {
+  box-shadow: 0 0 1px #0052cc;
+}
+
+.notifications-section input:checked + .slider:before {
+  -webkit-transform: translateX(20px); /* Move a bolinha */
+  -ms-transform: translateX(20px);
+  transform: translateX(20px);
+}
+
+.notifications-section .slider.round {
+  border-radius: 25px; /* Borda arredondada do switch */
+}
+
+.notifications-section .slider.round:before {
+  border-radius: 50%; /* Bolinha redonda */
+}
+
+.notifications-section p {
+  display: inline-block; /* Alinha o texto da notificação com o switch */
+  margin-bottom: 0;
+}
+
+.notifications-section .notification-description {
+  display: block; /* Quebra a linha para a descrição */
+  font-size: 13px;
+  color: #777;
+  margin-top: 5px;
+  margin-bottom: 20px;
+}
+
+.save-btn-bottom {
+  width: auto;
+  min-width: 120px;
+  margin-top: 20px;
+}
+
+/* --- Estilos da NOVA Seção: Ajuda & Suporte --- */
+.help-support-section h2 {
+  color: #333; /* Cor como na imagem */
+}
+
+.help-support-section p {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 25px; /* Espaço antes do botão */
+}
+
+.contact-btn {
+  width: auto;
+  min-width: 120px;
+  background-color: #0052cc; /* Azul forte como na imagem */
+  padding: 12px 25px; /* Ajuste no padding para o botão "Contato" */
+  font-weight: bold;
+  border-radius: 25px; /* Botão mais arredondado */
+}
+
+.contact-btn:hover {
+  background-color: #0041a3;
 }

@@ -1,171 +1,225 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Meu Perfil</title>
-    
-    <link rel="icon" type="image/png" href="assets/logos/title_logo_liferay.png" />
-    
+
+    <link
+      rel="icon"
+      type="image/png"
+      href="assets/logos/title_logo_liferay.png"
+    />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
     <link rel="stylesheet" href="css/perfil.css" />
-</head>
-<body>
+  </head>
+  <body>
     <header class="app-header">
-        <div class="logo">
-            <a href="homepage.html">
-                <img src="assets/logos/logo_liferay_semfundo.png" alt="Logo Liferay" />
-            </a>
-        </div>
+      <div class="logo">
+        <a href="homepage.html">
+          <img
+            src="assets/logos/logo_liferay_semfundo.png"
+            alt="Logo Liferay"
+          />
+        </a>
+      </div>
 
-        <div class="search-bar">
-            <i class="fas fa-search search-icon"></i>
-            <input
-                type="text"
-                placeholder="Pesquise por habilidades ou colaboradores"
-                id="search-input"
-                autocomplete="off"
+      <div class="search-bar">
+        <i class="fas fa-search search-icon"></i>
+        <input
+          type="text"
+          placeholder="Pesquise por habilidades ou colaboradores"
+          id="search-input"
+          autocomplete="off"
+        />
+        <div id="global-search-results"></div>
+      </div>
+
+      <nav class="user-nav">
+        <button class="button-icon" aria-label="Configurações">
+          <i class="fas fa-cog"></i>
+        </button>
+
+        <button
+          class="button-icon"
+          aria-label="Notificações"
+          data-notification="true"
+        >
+          <i class="fas fa-bell"></i>
+        </button>
+
+        <button class="button-icon" id="logout-button" title="Sair da conta">
+          <i class="fas fa-sign-out-alt" style="color: #dc3545"></i>
+        </button>
+        <div class="user-profile">
+          <a href="perfil.html">
+            <img
+              src="assets/pictures/profile-pic.png"
+              alt="Foto de Perfil"
+              id="header-profile-pic"
             />
-            <div id="global-search-results"></div>
+          </a>
+          <span id="header-profile-name">Carregando...</span>
         </div>
-
-        <nav class="user-nav">
-            <button class="button-icon" aria-label="Configurações">
-                <i class="fas fa-cog"></i>
-            </button>
-            
-            <button class="button-icon" aria-label="Notificações" data-notification="true">
-                <i class="fas fa-bell"></i>
-            </button>
-
-            <button class="button-icon" id="logout-button" title="Sair da conta">
-                <i class="fas fa-sign-out-alt" style="color: #dc3545;"></i>
-            </button>
-            <div class="user-profile">
-                <a href="perfil.html">
-                    <img src="assets/pictures/profile-pic.png" alt="Foto de Perfil" id="header-profile-pic" />
-                </a>
-                <span id="header-profile-name">Carregando...</span>
-            </div>
-        </nav>
+      </nav>
     </header>
 
     <main class="main-content">
-        <header class="profile-header">
-            <div class="profile-picture-container">
-                <img
-                    src="assets/pictures/profile-pic.png"
-                    alt="Foto de Perfil"
-                    class="profile-picture-large"
-                    id="main-profile-pic"
-                />
-                <label for="file-upload" class="edit-icon" title="Alterar foto">
-                    <i class="fas fa-camera"></i>
-                </label>
-                <input id="file-upload" type="file" accept="image/png, image/jpeg" />
-            </div>
-            
-            <div class="profile-info">
-                <div class="name-wrapper">
-                    <input type="text" id="profile-nome" class="profile-nome-input" placeholder="Seu Nome Completo" />
-                </div>
-
-                <input type="text" id="profile-titulo" class="profile-titulo-input" placeholder="Seu Título (ex: Dev Java)" />
-            </div>
-        </header>
-
-        <div class="tabs-container">
-            <div class="tabs">
-                <button class="tab-btn active" data-tab="habilidades">
-                    <i class="fas fa-code"></i> Minhas Habilidades
-                </button>
-                <button class="tab-btn" data-tab="eventos">
-                    <i class="fas fa-calendar-check"></i> Minhas inscrições
-                </button>
-                <button class="tab-btn" data-tab="historico">
-                    <i class="fas fa-history"></i> Histórico
-                </button>
-            </div>
+      <header class="profile-header">
+        <div class="profile-picture-container">
+          <img
+            src="assets/pictures/profile-pic.png"
+            alt="Foto de Perfil"
+            class="profile-picture-large"
+            id="main-profile-pic"
+          />
+          <label for="file-upload" class="edit-icon" title="Alterar foto">
+            <i class="fas fa-camera"></i>
+          </label>
+          <input id="file-upload" type="file" accept="image/png, image/jpeg" />
         </div>
 
-        <div class="profile-grid">
+        <div class="profile-info">
+          <div class="name-wrapper">
+            <input
+              type="text"
+              id="profile-nome"
+              class="profile-nome-input"
+              placeholder="Seu Nome Completo"
+            />
+          </div>
 
-            <div class="tab-content active" id="tab-habilidades">
-                <section class="skills-section">
-                    <h2>Minhas habilidades</h2>
+          <input
+            type="text"
+            id="profile-titulo"
+            class="profile-titulo-input"
+            placeholder="Seu Título (ex: Dev Java)"
+          />
+        </div>
+      </header>
 
-                    <div class="add-skill-form">
-                        <label for="skill-input">Adicionar nova habilidade:</label>
-                        <div class="input-wrapper">
-                            <input type="text" id="skill-input" placeholder="Ex: Python" />
-                            <button id="add-skill-btn" class="btn-primary">Adicionar</button>
-                        </div>
-                    </div>
+      <div class="tabs-container">
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="habilidades">
+            <i class="fas fa-code"></i> Minhas Habilidades
+          </button>
+          <button class="tab-btn" data-tab="eventos">
+            <i class="fas fa-calendar-check"></i> Minhas inscrições
+          </button>
+          <button class="tab-btn" data-tab="historico">
+            <i class="fas fa-history"></i> Histórico
+          </button>
+        </div>
+      </div>
 
-                    <div class="skills-list" id="skills-list"></div>
-                </section>
+      <div class="profile-grid">
+        <div class="tab-content active" id="tab-habilidades">
+          <section class="skills-section">
+            <h2>Minhas habilidades</h2>
+
+            <div class="add-skill-form">
+              <label for="skill-input">Adicionar nova habilidade:</label>
+              <div class="input-wrapper">
+                <input type="text" id="skill-input" placeholder="Ex: Python" />
+                <button id="add-skill-btn" class="btn-primary">
+                  Adicionar
+                </button>
+              </div>
             </div>
 
-            <div class="tab-content" id="tab-eventos">
-                <section class="eventos-section">
-                    <h2>Eventos Inscritos</h2>
-                    <p class="section-description">Eventos nos quais você está inscrito</p>
-
-                    <div id="eventos-loading" class="loading-container">
-                        <div class="spinner-large"></div>
-                        <p>Carregando seus eventos...</p>
-                    </div>
-
-                    <div id="eventos-list" class="eventos-list" style="display: none;"></div>
-
-                    <div id="eventos-empty" class="empty-state" style="display: none;">
-                        <i class="fas fa-calendar-times"></i>
-                        <h3>Nenhum evento encontrado</h3>
-                        <p>Você ainda não está inscrito em nenhum evento.</p>
-                        <a href="homepage.html" class="btn-primary">Ver Eventos Disponíveis</a>
-                    </div>
-                </section>
-            </div>
-
-            <div class="tab-content" id="tab-historico">
-                <section class="eventos-section">
-                    <h2>Histórico de Eventos</h2>
-                    <p class="section-description">Eventos que você já participou</p>
-
-                    <div id="historico-loading" class="loading-container">
-                        <div class="spinner-large"></div>
-                        <p>Carregando seu histórico...</p>
-                    </div>
-
-                    <div id="historico-list" class="eventos-list" style="display: none;"></div>
-
-                    <div id="historico-empty" class="empty-state" style="display: none;">
-                        <i class="fas fa-history"></i>
-                        <h3>Nenhum histórico disponível</h3>
-                        <p>Você ainda não participou de nenhum evento.</p>
-                        <a href="homepage.html" class="btn-primary">Ver Eventos Disponíveis</a>
-                    </div>
-                </section>
-            </div>
-
-            <aside class="about-section">
-                <div class="about-card">
-                    <h3>Sobre mim</h3>
-                    <textarea id="profile-sobre" rows="8" placeholder="Escreva um pouco sobre você..."></textarea>
-                    <button id="save-profile-btn" class="btn-primary">Salvar Alterações</button>
-                </div>
-            </aside>
+            <div class="skills-list" id="skills-list"></div>
+          </section>
         </div>
 
-        <a href="criar-evento.html" class="btn-float" id="create-event-btn">
-            Criar Evento
-        </a>
+        <div class="tab-content" id="tab-eventos">
+          <section class="eventos-section">
+            <h2>Eventos Inscritos</h2>
+            <p class="section-description">
+              Eventos nos quais você está inscrito
+            </p>
+
+            <div id="eventos-loading" class="loading-container">
+              <div class="spinner-large"></div>
+              <p>Carregando seus eventos...</p>
+            </div>
+
+            <div
+              id="eventos-list"
+              class="eventos-list"
+              style="display: none"
+            ></div>
+
+            <div id="eventos-empty" class="empty-state" style="display: none">
+              <i class="fas fa-calendar-times"></i>
+              <h3>Nenhum evento encontrado</h3>
+              <p>Você ainda não está inscrito em nenhum evento.</p>
+              <a href="homepage.html" class="btn-primary"
+                >Ver Eventos Disponíveis</a
+              >
+            </div>
+          </section>
+        </div>
+
+        <div class="tab-content" id="tab-historico">
+          <section class="eventos-section">
+            <h2>Histórico de Eventos</h2>
+            <p class="section-description">Eventos que você já participou</p>
+
+            <div id="historico-loading" class="loading-container">
+              <div class="spinner-large"></div>
+              <p>Carregando seu histórico...</p>
+            </div>
+
+            <div
+              id="historico-list"
+              class="eventos-list"
+              style="display: none"
+            ></div>
+
+            <div id="historico-empty" class="empty-state" style="display: none">
+              <i class="fas fa-history"></i>
+              <h3>Nenhum histórico disponível</h3>
+              <p>Você ainda não participou de nenhum evento.</p>
+              <a href="homepage.html" class="btn-primary"
+                >Ver Eventos Disponíveis</a
+              >
+            </div>
+          </section>
+        </div>
+
+        <aside class="about-section">
+          <div class="about-card">
+            <h3>Sobre mim</h3>
+            <textarea
+              id="profile-sobre"
+              rows="8"
+              placeholder="Escreva um pouco sobre você..."
+            ></textarea>
+            <button id="save-profile-btn" class="btn-primary">
+              Salvar Alterações
+            </button>
+          </div>
+        </aside>
+      </div>
+
+      <a href="den.html" class="btn-float-contato"> Contato </a>
+
+      <a href="criar-evento.html" class="btn-float" id="create-event-btn">
+        Criar Evento
+      </a>
     </main>
 
     <script src="js/global.js"></script>
     <script src="js/perfil.js"></script>
-</body>
+  </body>
 </html>

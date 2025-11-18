@@ -1173,3 +1173,39 @@ h1 {
 .contact-btn:hover {
   background-color: #0041a3;
 }
+
+.btn-float-evento,
+.btn-float-contato {
+  position: fixed; /* Essencial para flutuar */
+  right: 30px; /* Alinhamento na direita */
+
+  /* Estilos do botão (Pill shape) */
+  padding: 12px 25px;
+  border-radius: 50px; /* Deixa bem arredondado */
+
+  /* Estilos do texto */
+  text-decoration: none;
+  color: white;
+  font-weight: 700; /* Negrito */
+
+  /* Sombra e Posição */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000; /* Garante que fique acima de tudo */
+  transition: all 0.3s ease;
+}
+
+/* Efeito ao passar o mouse */
+.btn-float-evento:hover,
+.btn-float-contato:hover {
+  transform: translateY(-2px); /* Efeito de levantar */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Botão "Contato" (O novo botão) */
+.btn-float-contato {
+  /* Este é o azul brilhante da imagem que você enviou */
+  background-color: #0044ff;
+
+  /* Posição ACIMA do botão "Criar Evento" */
+  bottom: 110px;
+}

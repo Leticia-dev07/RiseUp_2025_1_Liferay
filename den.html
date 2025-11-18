@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Formulário de Contato</title>
+
+    <link rel="stylesheet" href="/css/den.css" />
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="header-left">
+        <img
+          src="/assets/logos/logo_liferay_semfundo.png"
+          alt="Liferay"
+          class="logo"
+        />
+      </div>
+      <div class="header-center">
+        <div class="search-bar">
+          <span class="search-icon"></span>
+          <input
+            type="text"
+            placeholder="Pesquise por habilidades ou colaboradores"
+          />
+        </div>
+      </div>
+      <div class="header-right">
+        <a href="#" class="header-icon"></a>
+        <a href="#" class="header-icon"></a>
+
+        <div class="user-profile">
+          <img
+            src="/assets/pictures/profile-pic.png"
+            alt="Foto de Ana Luisa"
+            class="user-avatar"
+          />
+          <span>Ana Luisa</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="contact-container">
+      <div class="form-section">
+        <h1>Entre em Contato</h1>
+
+        <form id="contactForm" novalidate>
+          <div class="form-grid">
+            <div class="form-group" data-field="nome">
+              <label for="nome" class="required">Nome</label>
+              <input type="text" id="nome" name="nome" />
+              <div class="error-message">Este campo é obrigatório.</div>
+            </div>
+
+            <div class="form-group" data-field="sobrenome">
+              <label for="sobrenome" class="required">Sobrenome</label>
+              <input type="text" id="sobrenome" name="sobrenome" />
+              <div class="error-message">Este campo é obrigatório.</div>
+            </div>
+
+            <div class="form-group" data-field="email">
+              <label for="email" class="required">Email corporativo</label>
+              <input type="email" id="email" name="email" />
+              <div class="error-message">
+                Por favor, insira um email válido.
+              </div>
+            </div>
+
+            <div class="form-group" data-field="telefone">
+              <label for="telefone" class="required">Telefone</label>
+              <input type="tel" id="telefone" name="telefone" />
+              <div class="error-message">Este campo é obrigatório.</div>
+            </div>
+
+            <div class="form-group" data-field="pais">
+              <label for="pais" class="required">País</label>
+              <input type="text" id="pais" name="pais" />
+              <div class="error-message">Este campo é obrigatório.</div>
+            </div>
+
+            <div class="form-group" data-field="area">
+              <label for="area" class="required">Área de trabalho</label>
+              <input type="text" id="area" name="area" />
+              <div class="error-message">Este campo é obrigatório.</div>
+            </div>
+
+            <div class="form-group full-width" data-field="motivo">
+              <label for="motivo">Motivo do contato</label>
+              <textarea id="motivo" name="motivo"></textarea>
+            </div>
+          </div>
+
+          <p class="privacy-note">
+            Informações sobre o processamento dos seus dados pessoais pela
+            Liferay são fornecidas em nosso Aviso de
+            <a href="#">Privacidade de Dados</a>.
+          </p>
+
+          <button type="submit" class="submit-btn">Enviar</button>
+        </form>
+      </div>
+
+      <div class="info-section">
+        <div class="info-card">
+          <img
+            src="/assets/logos/icon_mapa_png.png"
+            alt="Ícone da Sede"
+            class="card-icon"
+          />
+          <h3>Sede América Latina</h3>
+          <p class="company-name">Liferay Latin America Ltda</p>
+          <p>
+            Rua Alfândega dos Arcos, Nº 35, Sala 0401 - Paço Alfândega Recife,
+            PE Brasil
+          </p>
+          <a href="#" class="office-link">Conheça todos os escritórios+</a>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/den.js"></script>
+     
+  </body>
+</html>

@@ -1,0 +1,291 @@
+/* --- Estilos Gerais --- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  background-color: #ffffff;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* --- Estilos do Cabeçalho --- */
+.main-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 40px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #fff;
+}
+
+.header-left .logo {
+  height: 28px;
+  width: auto;
+}
+
+.header-center {
+  flex-grow: 1;
+  max-width: 600px;
+  padding: 0 24px;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  background-color: #f1f3f4;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.search-bar .search-icon {
+  font-size: 18px;
+  color: #555;
+  margin-right: 8px;
+}
+
+.search-bar input {
+  border: none;
+  background-color: transparent;
+  width: 100%;
+  font-size: 14px;
+  outline: none;
+}
+
+.search-bar input::placeholder {
+  color: #777;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.header-icon {
+  font-size: 22px;
+  color: #555;
+  text-decoration: none;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* --- Estilos da Página de Formulário (index.html) --- */
+.contact-container {
+  display: flex;
+  max-width: 1100px;
+  margin: 40px auto;
+  gap: 48px;
+  padding: 0 40px;
+}
+
+.form-section {
+  flex: 2;
+  background-color: #f8f9fa;
+  padding: 40px;
+  border-radius: 8px;
+}
+
+.form-section h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #0b5fff;
+  margin-bottom: 30px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.form-group label.required::after {
+  content: "*";
+  color: #d93025;
+  margin-left: 4px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.form-group textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.privacy-note {
+  font-size: 12px;
+  color: #666;
+  margin-top: 24px;
+}
+
+.privacy-note a {
+  color: #0b5fff;
+  text-decoration: none;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 14px;
+  margin-top: 16px;
+  background-color: #0b5fff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+  background-color: #004ce6;
+}
+
+.error-message {
+  color: #d93025;
+  font-size: 12px;
+  margin-top: 5px;
+  display: none;
+}
+
+.form-group.error .error-message {
+  display: block;
+}
+
+.form-group.error input,
+.form-group.error textarea {
+  border-color: #d93025;
+  background-color: #fef1f0;
+}
+
+.info-section {
+  flex: 1;
+  padding-top: 20px;
+}
+
+.info-card {
+  background-color: #f8f9fa;
+  padding: 24px;
+  border-radius: 8px;
+}
+
+.info-card .card-icon {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 12px;
+}
+
+.info-card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.info-card p {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.7;
+}
+
+.info-card p.company-name {
+  font-weight: 600;
+}
+
+.office-link {
+  display: inline-block;
+  margin-top: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0b5fff;
+  text-decoration: none;
+}
+
+.office-link:hover {
+  text-decoration: underline;
+}
+
+/* --- Estilos da Página de Confirmação (confirmation.html) --- */
+/* (Estes estilos foram movidos para cá) */
+
+.confirmation-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(
+    100vh - 80px
+  ); /* Altura da viewport menos a altura do header */
+  background-color: #f8f9fa;
+  padding: 20px;
+}
+
+.confirmation-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 60px 80px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.confirmation-icon-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 4px solid #0b5fff;
+  margin-bottom: 30px;
+  font-size: 50px;
+  color: #0b5fff;
+  font-weight: bold;
+}
+
+/* A regra do 'p' para .confirmation-card é específica */
+.confirmation-card p {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+    margin: 0;
+}

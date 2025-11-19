@@ -1,123 +1,141 @@
-/* --- Reset Básico e Padrões Globais --- */
+/* ============================================================
+   ARQUIVO: css/homepage.css (COMPLETO C/ BOTÃO FILTRO)
+   ============================================================ */
+
 :root {
   --cor-principal: #00318F;
-  --cor-texto-navegacao: #A1A2AF;
-  --cor-texto-claro: #BDBDC7;
-  --cor-fundo-claro: #F4F4F6;
-  --cor-fundo-icone: #F5F7FA;
-  --cor-borda: #EAEAEA;
+  --cor-texto-navegacao: #80829A;
+  --cor-texto-claro: #6B6C7E;
+  --cor-fundo-claro: #F5F6FA;
+  --cor-fundo-icone: #EEF0F5;
+  --cor-borda: #E0E0E5;
   --cor-branco: #FFFFFF;
   --cor-notificacao: #FA0000;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: 'Source Sans Pro', sans-serif;
   background-color: var(--cor-branco);
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
-/* --- 1. Header --- */
+/* ============================================================
+   1. HEADER (AGORA COM BOTÃO DE FILTRO)
+   ============================================================ */
 .app-header {
-  grid-column: 1 / -1;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 30px;
+  padding: 12px 30px;
   border-bottom: 1px solid var(--cor-borda);
+  background: var(--cor-branco);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  position: sticky; top: 0; z-index: 1000;
 }
 
-.logo img {
-  height: 35px;
+.logo img { height: 38px; display: block; }
+
+/* --- NOVA ESTRUTURA DE BUSCA + BOTÃO --- */
+.search-wrapper {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    max-width: 800px; /* Mais largo para caber o botão */
+    margin: 0 40px;
+    gap: 12px; /* Espaço entre o input e o botão azul */
 }
 
+/* Barra de Pesquisa (Ajustada) */
 .search-bar {
-  position: relative;
-  flex-grow: 1;
-  max-width: 700px;
-  margin: 0 30px;
-}
-
-.search-bar .search-icon {
-  position: absolute;
-  left: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--cor-texto-claro);
-  font-size: 18px;
+    position: relative;
+    flex-grow: 1; /* Ocupa todo o espaço restante */
+    width: 100%;
 }
 
 .search-bar input {
-  width: 100%;
-  padding: 12px 20px 12px 50px;
-  border: none;
-  border-radius: 40px;
-  background: var(--cor-fundo-claro);
-  font-size: 16px;
-  color: var(--cor-texto-claro);
+  width: 100%; padding: 10px 20px 10px 48px;
+  border: 1px solid transparent; border-radius: 50px;
+  background: var(--cor-fundo-claro); font-size: 15px; color: #333;
+  outline: none; transition: 0.2s;
+}
+.search-bar input:focus { background: #fff; border-color: var(--cor-principal); box-shadow: 0 0 0 3px rgba(0,49,143,0.1); }
+.search-bar .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #999; font-size: 18px; }
+
+/* --- BOTÃO DE FILTRO AZUL (NOVO) --- */
+.filter-container { position: relative; }
+
+.btn-filtro {
+    background-color: #206ec5; /* Azul do botão */
+    color: white;
+    border: none;
+    border-radius: 4px; /* Cantos levemente arredondados */
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    transition: background 0.2s;
+    box-shadow: 0 2px 5px rgba(32, 110, 197, 0.3);
 }
 
-.user-nav {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+.btn-filtro:hover {
+    background-color: #195aa3;
 }
 
+/* Dropdown do Filtro (Escondido) */
+.filter-dropdown {
+    display: none;
+    position: absolute;
+    top: 115%;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    width: 180px;
+    z-index: 1002;
+}
+.filter-dropdown a { display: block; padding: 10px 15px; text-decoration: none; color: #333; font-size: 14px; }
+.filter-dropdown a:hover { background-color: #f5f5f5; color: #206ec5; }
+
+/* --- FIM DA ESTRUTURA DE BUSCA --- */
+
+/* Navegação */
+.user-nav { display: flex; align-items: center; gap: 12px; }
 .button-icon {
-  background: var(--cor-fundo-icone);
-  border: none;
-  border-radius: 50%;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 18px;
-  color: var(--cor-principal);
-  cursor: pointer;
-  position: relative;
+  background: transparent; border: 1px solid transparent;
+  border-radius: 50%; width: 40px; height: 40px;
+  display: flex; justify-content: center; align-items: center;
+  font-size: 18px; color: var(--cor-texto-navegacao);
+  cursor: pointer; transition: 0.2s;
 }
-
+.button-icon:hover { background-color: var(--cor-fundo-icone); color: var(--cor-principal); transform: translateY(-2px); }
 .button-icon[data-notification="true"]::after {
-  content: '';
-  width: 8px;
-  height: 8px;
-  background-color: var(--cor-notificacao);
-  border-radius: 50%;
-  position: absolute;
-  top: 10px;
-  right: 12px;
+  content: ''; width: 9px; height: 9px; background: var(--cor-notificacao);
+  border-radius: 50%; position: absolute; top: 8px; right: 10px;
 }
 
-.user-profile {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+#logout-button:hover { background-color: #ffe5e5; }
+#logout-button:hover i { color: #dc3545; }
 
-.user-profile img {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-}
+.user-profile { display: flex; align-items: center; gap: 10px; text-decoration: none; margin-left: 10px; padding-left: 15px; border-left: 1px solid var(--cor-borda); }
+.user-profile img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--cor-branco); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.user-profile span { font-weight: 600; font-size: 14px; color: #333; max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-.user-profile span {
-  font-weight: 600;
-  font-size: 16px;
-}
 
-/* --- 3. Conteúdo Principal --- */
+/* ============================================================
+   2. CONTEÚDO PRINCIPAL (CARROSSEL)
+   ============================================================ */
 .main-content {
-  grid-row: 2;
+  flex: 1;
   overflow-y: auto;
   padding: 40px 0;
   display: flex;
@@ -125,234 +143,93 @@ body {
   align-items: center;
 }
 
-.content-section {
-  margin-bottom: 50px;
-}
-
+.content-section { margin-bottom: 50px; width: 100%; max-width: 1200px; padding: 0 20px; }
 .content-section h2 {
-  text-align: center;
+  text-align: left;
   color: var(--cor-principal);
-  font-size: 32px;
-  font-weight: 600;
-  margin-bottom: 30px;
-}
-
-/* --- ESTILOS DO CARROSSEL --- */
-.carousel {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
-
-.carousel-viewport {
-  position: relative;
-  overflow: hidden;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.carousel-track {
-  display: flex;
-  gap: 30px;
-  transition: transform 0.5s ease-in-out;
-}
-
-/* --- BOTÕES (ARROWS) DO CARROSSEL --- */
-.carousel-arrow {
-  position: absolute;
-  top: 118px;
-  transform: translateY(-50%);
-  background: var(--cor-fundo-icone);
-  border: none;
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  font-size: 22px;
-  color: var(--cor-principal);
-  cursor: pointer;
-  z-index: 10;
-  opacity: 0.9;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-
-.carousel-arrow:hover {
-  opacity: 1;
-  transform: translateY(-50%) scale(1.1);
-}
-
-.carousel-arrow:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-  transform: translateY(-50%) scale(1);
-}
-
-.carousel-arrow.prev {
-  left: -70px;
-}
-
-.carousel-arrow.next {
-  right: -50px;
-}
-
-.card {
-  width: 370px; 
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.card img {
-  width: 100%;
-  height: 236px;
-  border-radius: 27px;
-  margin-bottom: 20px;
-  object-fit: cover;
-  background-color: var(--cor-principal);
-}
-
-.card h3 {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--cor-principal);
-  line-height: 1.3;
-  min-height: 100px;
-}
-
-.carousel-pagination {
-  text-align: center;
-  margin-top: 25px;
-}
-
-.carousel-pagination .dot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #D8D8D8;
-  margin: 0 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.carousel-pagination .dot.active {
-  background: var(--cor-principal);
-}
-
-/* --- RESULTADOS DA PESQUISA GLOBAL --- */
-#global-search-results {
-  display: none;
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  right: 0;
-  background-color: var(--cor-branco, #FFFFFF);
-  border: 1px solid var(--cor-borda, #EAEAEA);
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  z-index: 1000;
-  max-height: 450px;
-  overflow-y: auto;
-  animation: slideDown 0.2s ease-out;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-#global-search-results::-webkit-scrollbar {
-  width: 8px;
-}
-
-#global-search-results::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
-}
-
-#global-search-results::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 10px;
-}
-
-#global-search-results::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
-}
-
-#global-search-results a {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 14px 18px;
-  text-decoration: none;
-  color: var(--cor-texto, #333);
-  border-bottom: 1px solid var(--cor-borda, #EAEAEA);
-  transition: all 0.2s ease;
-  cursor: pointer;
-  position: relative;
-}
-
-#global-search-results a:last-child {
-  border-bottom: none;
-}
-
-#global-search-results a:hover {
-  background: linear-gradient(90deg, #f8f9ff 0%, #ffffff 100%);
-  border-left: 3px solid var(--cor-principal, #00318F);
+  font-size: 28px; font-weight: 700;
+  margin-bottom: 25px;
   padding-left: 15px;
-  transform: translateX(2px);
+  border-left: 5px solid var(--cor-principal);
 }
 
-/* --- AQUI REMOVEMOS A BOLINHA AZUL (::before e ::after) --- */
+/* Carrossel */
+.carousel { position: relative; display: flex; align-items: center; width: 100%; }
+.carousel-viewport { overflow: hidden; width: 100%; padding: 10px 5px; }
+.carousel-track { display: flex; gap: 30px; transition: transform 0.5s ease-in-out; }
 
-#global-search-results a strong {
-  display: block;
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--cor-texto, #333);
-  margin-bottom: 4px;
+.carousel-arrow {
+  background: var(--cor-fundo-icone); border: none; border-radius: 50%;
+  width: 48px; height: 48px; font-size: 20px; color: var(--cor-principal);
+  cursor: pointer; z-index: 10; transition: 0.3s;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1); flex-shrink: 0;
+}
+.carousel-arrow:hover { transform: scale(1.1); background-color: #fff; }
+.carousel-arrow:disabled { opacity: 0.5; cursor: not-allowed; }
+.carousel-arrow.prev { margin-right: 15px; }
+.carousel-arrow.next { margin-left: 15px; }
+
+/* Cards */
+.card {
+  width: 350px; flex-shrink: 0;
+  background: #fff; border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  overflow: hidden; transition: 0.3s;
+  border: 1px solid #eee;
+  display: flex; flex-direction: column;
+}
+.card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); border-color: var(--cor-principal); }
+
+.card img { width: 100%; height: 200px; object-fit: cover; background-color: #f0f0f0; }
+.card h3 { padding: 20px; margin: 0; font-size: 18px; font-weight: 700; color: #333; line-height: 1.4; }
+.card h3 a { text-decoration: none; color: inherit; }
+.card h3 a:hover { color: var(--cor-principal); }
+.card p { padding: 0 20px 20px 20px; font-size: 14px; color: #666; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* ============================================================
+   3. BOTÃO DE CONTATO FLUTUANTE
+   ============================================================ */
+.btn-float-contato {
+  position: fixed;
+  bottom: 40px; 
+  right: 40px;
+  background-color: #0044ff;
+  color: white;
+  border-radius: 50px;
+  padding: 14px 28px;
+  font-size: 16px; font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  transition: 0.3s;
+  z-index: 199;
+  display: flex; align-items: center; gap: 10px;
+}
+.btn-float-contato:hover { transform: translateY(-3px); background-color: #0033cc; }
+
+/* ============================================================
+   4. RESULTADOS DA PESQUISA (CORRIGIDO)
+   ============================================================ */
+#global-search-results {
+  display: none; position: absolute; top: 100%; left: 0; width: 100%;
+  background: #fff; border: 1px solid #eee; border-radius: 0 0 12px 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 1000; max-height: 400px; overflow-y: auto;
+}
+#global-search-results a {
+  display: flex; align-items: center; padding: 12px 15px;
+  border-bottom: 1px solid #f0f0f0; text-decoration: none; color: #333;
+}
+#global-search-results a:hover { background: #f9f9f9; }
+#global-search-results a::before, #global-search-results a::after { display: none !important; } /* Sem bolinha azul */
+#global-search-results a img {
+  display: block !important; width: 40px; height: 40px; border-radius: 50%; margin-right: 12px;
 }
 
-#global-search-results a span {
-  display: block;
-  font-size: 14px;
-  color: var(--cor-texto-navegacao, #A1A2AF);
-  font-weight: 400;
-}
-
-/* Estilo para a Badge (se usada) */
-#global-search-results a .badge {
-  padding: 4px 10px;
-  background: var(--cor-fundo-claro, #F4F4F6);
-  color: var(--cor-principal, #00318F);
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  margin-left: 8px;
-}
-
+/* RESPONSIVIDADE */
 @media (max-width: 768px) {
-  #global-search-results {
-    max-height: 350px;
-    border-radius: 8px;
-  }
-
-  #global-search-results a strong {
-    font-size: 15px;
-  }
-
-  #global-search-results a span {
-    font-size: 13px;
-  }
+  .app-header { padding: 10px 15px; flex-wrap: wrap; }
+  .search-wrapper { order: 3; width: 100%; margin: 10px 0 0 0; max-width: none; }
+  .carousel-track { gap: 15px; }
+  .card { width: 280px; }
+  .btn-float-contato { bottom: 20px; right: 20px; padding: 12px 20px; font-size: 14px; }
 }

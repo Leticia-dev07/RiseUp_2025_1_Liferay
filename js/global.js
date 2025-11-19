@@ -1,5 +1,5 @@
 // ===============================================
-// ARQUIVO: global.js (VERSÃO FINAL INTEGRADA)
+// ARQUIVO: js/global.js (VERSÃO FINAL COMPLETA)
 // ===============================================
 
 // 1. Definições globais
@@ -9,9 +9,8 @@ const SERVER_URL = "http://localhost:8080";
 // Tenta pegar o token (verifica ambos os nomes comuns para garantir)
 const token = localStorage.getItem("token") || localStorage.getItem("authToken");
 
-// 2. Verificação de segurança (Redireciona se não tiver logado)
+// 2. Verificação de segurança (Opcional - Redireciona se não tiver logado)
 if (!token && !window.location.pathname.endsWith('login.html') && !window.location.pathname.endsWith('criar-conta.html')) {
-    // Descomente a linha abaixo quando quiser bloquear o acesso não autorizado
     // window.location.href = "login.html"; 
 }
 
@@ -31,16 +30,13 @@ async function carregarDadosUsuario() {
 
         const perfil = await response.json();
         
-        // Elementos do HTML do Header
         const userImage = document.getElementById("header-profile-pic"); 
         const userNameSpan = document.getElementById("header-profile-name");
 
-        // Preenche Nome
         if (userNameSpan && perfil.nomeCompleto) {
             userNameSpan.textContent = perfil.nomeCompleto;
         }
 
-        // Preenche Foto
         if (userImage && perfil.fotoPerfilUrl) {
             userImage.src = perfil.fotoPerfilUrl.startsWith("http") 
                 ? perfil.fotoPerfilUrl 
@@ -55,7 +51,7 @@ async function carregarDadosUsuario() {
 // 2. CONFIGURAR LOGOUT
 // =====================
 function setupLogout() {
-    const logoutButton = document.getElementById("logout-button"); // Se existir um botão com esse ID
+    const logoutButton = document.getElementById("logout-button"); 
     if (logoutButton) {
         logoutButton.addEventListener("click", (e) => {
             e.preventDefault();
@@ -68,15 +64,48 @@ function setupLogout() {
 }
 
 // =====================
-// 3. BARRA DE PESQUISA GLOBAL (COM FOTOS)
+// 3. BARRA DE PESQUISA GLOBAL (COM FOTOS E FILTRO)
 // =====================
 function setupGlobalSearch() {
     const searchInput = document.getElementById("search-input");
     const resultsContainer = document.getElementById("global-search-results");
 
+    // Elementos do Filtro (Se existirem na página)
+    const btnFiltro = document.getElementById("btn-filtro-home");
+    const dropdownFiltro = document.getElementById("filter-dropdown-home");
+    const opcoesFiltro = dropdownFiltro ? dropdownFiltro.querySelectorAll("a") : [];
+    
+    // Variável de estado do filtro (Padrão: busca tudo)
+    let filtroAtual = "todos"; 
+
     if (!searchInput || !resultsContainer) return;
 
-    // Função de atraso para não chamar a API a cada letra (Debounce)
+    // --- LÓGICA DO MENU FILTRO ---
+    if (btnFiltro && dropdownFiltro) {
+        btnFiltro.addEventListener("click", (e) => {
+            e.stopPropagation();
+            dropdownFiltro.style.display = dropdownFiltro.style.display === "block" ? "none" : "block";
+        });
+
+        opcoesFiltro.forEach(link => {
+            link.addEventListener("click", (e) => {
+                e.preventDefault();
+                filtroAtual = e.target.getAttribute("data-value");
+                btnFiltro.innerHTML = `<i class="fas fa-filter"></i> ${e.target.textContent} <i class="fas fa-caret-down"></i>`;
+                dropdownFiltro.style.display = "none";
+
+                if (searchInput.value.trim().length >= 2) {
+                    fetchResults(searchInput.value);
+                }
+            });
+        });
+
+        document.addEventListener("click", () => {
+            dropdownFiltro.style.display = "none";
+        });
+    }
+
+    // --- LÓGICA DA BUSCA ---
     const debounce = (func, delay) => {
         let timeoutId;
         return (...args) => {
@@ -85,14 +114,16 @@ function setupGlobalSearch() {
         };
     };
 
-    // Função que chama a API
     const fetchResults = async (query) => {
         if (query.length < 2) { 
             resultsContainer.style.display = "none";
             return;
         }
         try {
-            const response = await fetch(`${API_URL}/perfis/buscar?q=${encodeURIComponent(query)}`, {
+            // Envia o filtro para o Java
+            const url = `${API_URL}/perfis/buscar?q=${encodeURIComponent(query)}&filtro=${filtroAtual}`;
+            
+            const response = await fetch(url, {
                 headers: { 'Authorization': 'Bearer ' + token }
             });
             
@@ -107,7 +138,6 @@ function setupGlobalSearch() {
         }
     };
 
-    // Função que desenha os resultados na tela
     const renderResults = (results) => {
         resultsContainer.innerHTML = ""; 
 
@@ -118,31 +148,29 @@ function setupGlobalSearch() {
         }
 
         results.forEach(item => {
-            // Tenta encontrar a URL da foto em vários campos possíveis
             const fotoBanco = item.fotoPerfilUrl || item.fotoUrl || item.urlPerfil; 
-            
-            let fotoFinal = "assets/pictures/profile-pic.png"; // Imagem padrão
+            let fotoFinal = "assets/pictures/profile-pic.png"; 
 
-            // Se tiver foto, ajusta o caminho
-            if (fotoBanco && fotoBanco.length > 5) { // Checagem simples se não é string vazia
-                fotoFinal = fotoBanco.startsWith("http") 
-                    ? fotoBanco 
-                    : SERVER_URL + fotoBanco;
+            if (fotoBanco && fotoBanco.length > 5) { 
+                fotoFinal = fotoBanco.startsWith("http") ? fotoBanco : SERVER_URL + fotoBanco;
             }
 
-            // Cria o link do resultado
+            // Lógica de Link e Formato (Pessoa vs Evento)
+            let linkDestino = `perfil.html?usuarioId=${item.id || item.usuarioId}`;
+            let imgRadius = "50%";
+            let imgDefault = "assets/pictures/profile-pic.png";
+
+            // Se for evento (identificado pelo Java ou pelo filtro)
+            if (filtroAtual === 'eventos' || item.descricao === 'Evento') {
+                linkDestino = `detalhes-evento.html?id=${item.id}`;
+                imgRadius = "8px"; // Quadrado arredondado
+                imgDefault = "assets/pictures/liferay-devcon.jpg"; // Imagem de evento padrão
+                if(item.imagemUrl) fotoFinal = item.imagemUrl;
+            }
+
             const link = document.createElement('a');
+            link.href = linkDestino;
             
-            // Define para onde vai ao clicar (Perfil ou Evento)
-            // Se o DTO tiver 'urlPerfil' (como ajustamos no Java), usa ele. Senão, tenta montar manualmente.
-            if (item.urlPerfil && item.urlPerfil.includes(".html")) {
-                link.href = item.urlPerfil;
-            } else {
-                // Fallback: assume que é um usuário
-                link.href = `perfil.html?usuarioId=${item.id || item.usuarioId}`;
-            }
-            
-            // Estilo CSS inline para garantir o layout
             link.style.cssText = `
                 display: flex; 
                 align-items: center; 
@@ -155,12 +183,11 @@ function setupGlobalSearch() {
                 transition: background 0.2s;
             `;
             
-            // HTML interno do item (Foto + Texto)
             link.innerHTML = `
                 <img src="${fotoFinal}" 
                      alt="${item.nome}" 
-                     style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 12px; border: 1px solid #ddd;"
-                     onerror="this.src='assets/pictures/profile-pic.png'">
+                     style="width: 40px; height: 40px; border-radius: ${imgRadius}; object-fit: cover; margin-right: 12px; border: 1px solid #ddd;"
+                     onerror="this.src='${imgDefault}'">
                 
                 <div style="display: flex; flex-direction: column;">
                     <strong style="font-size: 14px;">${item.nome}</strong>
@@ -168,7 +195,6 @@ function setupGlobalSearch() {
                 </div>
             `;
             
-            // Efeitos de Hover
             link.onmouseover = () => link.style.background = "#f9f9f9";
             link.onmouseout = () => link.style.background = "#fff";
 
@@ -178,12 +204,10 @@ function setupGlobalSearch() {
         resultsContainer.style.display = 'block';
     };
 
-    // Evento de digitação
     searchInput.addEventListener('input', debounce((e) => {
         fetchResults(e.target.value);
     }, 300));
 
-    // Fechar dropdown ao clicar fora
     document.addEventListener('click', (e) => {
         if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
             resultsContainer.style.display = 'none';

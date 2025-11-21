@@ -17,47 +17,36 @@ if (!token && !window.location.pathname.endsWith('login.html') && !window.locati
 // =====================
 // 1. CARREGAR DADOS DO CABEÇALHO (FOTO E NOME)
 // =====================
-// =====================
-// 1. CARREGAR DADOS DO CABEÇALHO (FOTO E NOME)
-// =====================
 async function carregarDadosUsuario() {
-    if (!token) return; 
+    if (!token) return; 
 
-    try {
-        const response = await fetch(`${API_URL}/perfis/me`, {
-            method: "GET",
-            headers: { Authorization: "Bearer " + token },
-        });
+    try {
+        const response = await fetch(`${API_URL}/perfis/me`, {
+            method: "GET",
+            headers: { Authorization: "Bearer " + token },
+        });
 
-        // 🌟 MELHORIA AQUI: Se der 403 ou 401, o token é inválido.
-        if (response.status === 403 || response.status === 401) {
-            console.warn("Token inválido ou expirado. Deslogando...");
-            localStorage.removeItem("token");
-            localStorage.removeItem("authToken");
-            window.location.href = "login.html"; // Manda pro login
-            return;
-        }
+        if (!response.ok) return;
 
-        if (!response.ok) return;
+        const perfil = await response.json();
+        
+        const userImage = document.getElementById("header-profile-pic"); 
+        const userNameSpan = document.getElementById("header-profile-name");
 
-        const perfil = await response.json();
-        
-        const userImage = document.getElementById("header-profile-pic"); 
-        const userNameSpan = document.getElementById("header-profile-name");
+        if (userNameSpan && perfil.nomeCompleto) {
+            userNameSpan.textContent = perfil.nomeCompleto;
+        }
 
-        if (userNameSpan && perfil.nomeCompleto) {
-            userNameSpan.textContent = perfil.nomeCompleto;
-        }
-
-        if (userImage && perfil.fotoPerfilUrl) {
-            userImage.src = perfil.fotoPerfilUrl.startsWith("http") 
-                ? perfil.fotoPerfilUrl 
-                : SERVER_URL + perfil.fotoPerfilUrl;
-        }
-    } catch (error) {
-        console.error("Erro ao carregar header:", error);
-    }
+        if (userImage && perfil.fotoPerfilUrl) {
+            userImage.src = perfil.fotoPerfilUrl.startsWith("http") 
+                ? perfil.fotoPerfilUrl 
+                : SERVER_URL + perfil.fotoPerfilUrl;
+        }
+    } catch (error) {
+        console.error("Erro ao carregar header:", error);
+    }
 }
+
 // =====================
 // 2. CONFIGURAR LOGOUT
 // =====================

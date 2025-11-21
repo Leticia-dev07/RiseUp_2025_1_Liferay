@@ -1,4 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // 🎯 URL do Servidor Render (Definida para clareza)
+    const RENDER_BASE_URL = "https://back-end-riseup-liferay-5.onrender.com"; 
+
     // 1. IDs CORRIGIDOS para bater com seu HTML
     const loginForm = document.getElementById("loginForm");
     const loginInput = document.getElementById("username");
@@ -28,9 +31,10 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         try {
-            const response = await fetch("http://localhost:8080/api/auth/login", {
+            // 🌟 URL CORRIGIDA AQUI 🌟
+            const response = await fetch(`${RENDER_BASE_URL}/api/auth/login`, {
                 
-                // 4. GARANTE O MÉTODO "POST" (A CORREÇÃO DO ERRO 405)
+                // 4. GARANTE O MÉTODO "POST"
                 method: "POST", 
                 
                 headers: {
@@ -54,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
         } catch (error) {
-            // FALHA DE REDE (ex: back-end desligado)
+            // FALHA DE REDE (ex: back-end desligado ou URL errada)
             console.error("Erro na requisição:", error);
             feedbackMessage.textContent = "Não foi possível conectar ao servidor.";
             feedbackMessage.style.color = "red";

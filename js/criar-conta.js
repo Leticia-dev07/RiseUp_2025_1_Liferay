@@ -4,6 +4,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const registerForm = document.getElementById("register-form");
     const messageDiv = document.getElementById("message");
     const submitButton = document.getElementById("submit-button");
+    
+    // 🎯 URL do Servidor Render
+    const RENDER_BASE_URL = "https://back-end-riseup-liferay-5.onrender.com"; // Variável Auxiliar
     // const fileInput foi removido
 
     // setupPhotoPreview() foi removido
@@ -40,7 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // --- 3. FAZER A REQUISIÇÃO (Apenas JSON) ---
         try {
-            const response = await fetch("http://localhost:8080/api/auth/register", {
+            // 🌟 URL CORRIGIDA AQUI 🌟
+            const response = await fetch(`${RENDER_BASE_URL}/api/auth/register`, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json' // Definimos o Content-Type como JSON

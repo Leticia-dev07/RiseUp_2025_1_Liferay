@@ -76,7 +76,7 @@ function setupLogout() {
 }
 
 // =====================
-// BARRA DE PESQUISA GLOBAL
+// BARRA DE PESQUISA GLOBAL (CORRIGIDA E BLINDADA 🛡️)
 // =====================
 function setupGlobalSearch() {
     const searchInput = document.getElementById("search-input");
@@ -89,6 +89,7 @@ function setupGlobalSearch() {
 
     if (!searchInput || !resultsContainer) return;
 
+    // Toggle do Filtro
     if (btnFiltro && dropdownFiltro) {
         btnFiltro.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -147,6 +148,7 @@ function setupGlobalSearch() {
 
         results.forEach(item => {
             // --- 1. IMAGEM INTELIGENTE ---
+            // Tenta encontrar a imagem em qualquer campo possível
             const rawImg = item.imagemUrl || item.fotoPerfilUrl || item.fotoUrl || item.urlPerfil;
             const rawLink = item.link;
 
@@ -158,7 +160,7 @@ function setupGlobalSearch() {
 
             let fotoFinal = imgDefault;
 
-            // Função para validar se parece imagem
+            // Validação robusta para identificar se é imagem
             const isImage = (val) => val && typeof val === 'string' && !val.includes(".html") && (val.includes("cloudinary") || val.includes("/fotos/") || val.match(/\.(jpg|jpeg|png|gif)$/i));
 
             let foundImg = null;
@@ -174,15 +176,17 @@ function setupGlobalSearch() {
             }
 
             // --- 2. LINK BLINDADO ---
+            // Extrai o ID numérico para montar o link limpo
             let idCru = item.id || item.usuarioId;
             
-            // Tenta pescar ID
+            // Se não tiver ID direto, tenta pescar de strings
             if (!idCru) {
                 const textoLink = item.link || item.urlPerfil || "";
                 const match = textoLink.match(/id=(\d+)/) || textoLink.match(/usuarioId=(\d+)/);
                 if (match) idCru = match[1];
             }
 
+            // Remove caracteres não numéricos para evitar URLs sujas
             let idLimpo = idCru ? String(idCru).replace(/\D/g, "") : "";
             let linkDestino = "#";
             
@@ -210,7 +214,7 @@ function setupGlobalSearch() {
                 color: #333; cursor: pointer; background: #fff; transition: background 0.2s;
             `;
             
-            // AQUI: Adicionamos o evento 'error' inline na imagem para garantir o fallback
+            // Fallback inline para imagem quebrada (onerror)
             link.innerHTML = `
                 <img src="${fotoFinal}" 
                      alt="${item.nome}" 

@@ -1,72 +1,101 @@
-// --- SCRIPT DE VALIDAÇÃO ---
+// ===============================================
+// ARQUIVO: js/contato.js (VALIDAÇÃO E REDIRECIONAMENTO)
+// ===============================================
 
-// Seleciona o formulário
-const form = document.getElementById('contactForm');
+document.addEventListener("DOMContentLoaded", () => {
+    // Seleciona o formulário pelo ID (verifique se no HTML é 'contactForm' ou apenas <form>)
+    const form = document.getElementById('contactForm') || document.querySelector('form');
 
-// Adiciona um "ouvinte" para o evento de "submit" (envio)
-form.addEventListener('submit', function(event) {
-    
-    // 1. Impede que o formulário seja enviado da forma tradicional
-    event.preventDefault();
+    if (!form) return;
 
-    // 2. Limpa todos os erros antigos antes de validar de novo
-    resetErrors();
-
-    let hasError = false;
-
-    // 3. Define quais campos são obrigatórios
-    const requiredFields = [
-        { id: 'nome', message: 'Este campo é obrigatório.' },
-        { id: 'sobrenome', message: 'Este campo é obrigatório.' },
-        { id: 'email', message: 'Por favor, insira um email válido.' },
-        { id: 'telefone', message: 'Este campo é obrigatório.' },
-        { id: 'pais', message: 'Este campo é obrigatório.' },
-        { id: 'area', message: 'Este campo é obrigatório.' }
-    ];
-
-    // 4. Loop para verificar cada campo obrigatório
-    requiredFields.forEach(field => {
-        const input = document.getElementById(field.id);
+    form.addEventListener('submit', function(event) {
         
-        // Validação especial para email
-        if (field.id === 'email') {
-            if (!isValidEmail(input.value)) {
+        // 1. Impede o envio padrão para validar primeiro
+        event.preventDefault();
+
+        // 2. Limpa erros antigos
+        resetErrors();
+
+        let hasError = false;
+
+        // 3. Lista de campos obrigatórios (IDs devem bater com o HTML)
+        const requiredFields = [
+            { id: 'nome', message: 'Este campo é obrigatório.' },
+            { id: 'sobrenome', message: 'Este campo é obrigatório.' },
+            { id: 'email', message: 'Por favor, insira um email válido.' },
+            { id: 'telefone', message: 'Este campo é obrigatório.' },
+            { id: 'pais', message: 'Este campo é obrigatório.' },
+            { id: 'area', message: 'Este campo é obrigatório.' }
+        ];
+
+        // 4. Loop de validação
+        requiredFields.forEach(field => {
+            const input = document.getElementById(field.id);
+            
+            // Se não achou o input no HTML, pula (evita erro de null)
+            if (!input) return;
+
+            if (field.id === 'email') {
+                if (!isValidEmail(input.value)) {
+                    showError(input, field.message);
+                    hasError = true;
+                }
+            } 
+            else if (input.value.trim() === '') {
                 showError(input, field.message);
                 hasError = true;
             }
-        } 
-        // Validação para outros campos (se estão vazios)
-        else if (input.value.trim() === '') {
-            showError(input, field.message);
-            hasError = true;
+        });
+
+        // 5. SE TUDO ESTIVER CERTO -> REDIRECIONA!
+        if (!hasError) {
+            // Simula um envio rápido (pode adicionar loading se quiser)
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if(submitBtn) {
+                submitBtn.textContent = "Enviando...";
+                submitBtn.disabled = true;
+            }
+
+            // Pequeno delay para UX (opcional), depois redireciona
+            setTimeout(() => {
+                window.location.href = 'den-conc.html';
+            }, 500);
         }
     });
-
-    // 5. Se não houver erros, redireciona para a página de confirmação
-    if (!hasError) {
-        // !! ESTA É A LINHA CORRIGIDA !!
-        window.location.href = 'den-conc.html';
-    }
 });
 
-// Função para mostrar o erro (adiciona classes CSS)
+// --- FUNÇÕES AUXILIARES ---
+
 function showError(input, message) {
-    const formGroup = input.closest('.form-group');
-    formGroup.classList.add('error');
-    
-    const errorMessage = formGroup.querySelector('.error-message');
-    errorMessage.textContent = message;
+    // Tenta achar o pai .form-group ou usa o pai direto
+    const formGroup = input.closest('.form-group') || input.parentElement;
+    if(formGroup) {
+        formGroup.classList.add('error');
+        
+        // Procura o span de erro ou cria um se não existir
+        let errorMessage = formGroup.querySelector('.error-message');
+        if (!errorMessage) {
+            errorMessage = document.createElement('span');
+            errorMessage.className = 'error-message';
+            errorMessage.style.color = 'red';
+            errorMessage.style.fontSize = '12px';
+            errorMessage.style.display = 'block';
+            errorMessage.style.marginTop = '5px';
+            formGroup.appendChild(errorMessage);
+        }
+        errorMessage.textContent = message;
+    }
 }
 
-// Função para limpar todos os erros
 function resetErrors() {
-    const errorGroups = document.querySelectorAll('.form-group.error');
+    const errorGroups = document.querySelectorAll('.error');
     errorGroups.forEach(group => {
         group.classList.remove('error');
+        const msg = group.querySelector('.error-message');
+        if (msg) msg.textContent = '';
     });
 }
 
-// Função simples para checar se o email tem um formato válido
 function isValidEmail(email) {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);

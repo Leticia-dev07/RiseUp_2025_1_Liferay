@@ -1,26 +1,23 @@
 // ===============================================
-// ARQUIVO: js/global.js (VERSÃO FINAL COM PROTEÇÃO DE ROTA)
+// ARQUIVO: js/global.js (CORRIGIDO PARA BUSCA)
 // ===============================================
 
-// 1. Definições globais - ATUALIZADAS PARA O SERVIDOR RENDER
+// 1. Definições globais
 const API_URL = "https://back-end-riseup-liferay-5.onrender.com/api"; 
 const SERVER_URL = "https://back-end-riseup-liferay-5.onrender.com";
 
-// Tenta pegar o token (verifica ambos os nomes comuns para garantir)
 const token = localStorage.getItem("token") || localStorage.getItem("authToken");
 
-// 2. Verificação de segurança (ATIVADA 🚀)
-// Se NÃO tem token E o usuário NÃO está na página de login ou criar conta...
+// 2. Proteção de Rota
 if (!token) {
     const path = window.location.pathname;
-    // Verifica se não estamos na página de login ou registro para evitar loop infinito
     if (!path.endsWith('login.html') && !path.endsWith('criar-conta.html')) {
-        window.location.href = "login.html"; // CHUTA PARA O LOGIN
+        window.location.href = "login.html";
     }
 }
 
 // =====================
-// 1. CARREGAR DADOS DO CABEÇALHO (FOTO E NOME)
+// 1. CARREGAR DADOS DO CABEÇALHO
 // =====================
 async function carregarDadosUsuario() {
     if (!token) return; 
@@ -31,9 +28,8 @@ async function carregarDadosUsuario() {
             headers: { Authorization: "Bearer " + token },
         });
 
-        // 🌟 PROTEÇÃO EXTRA: Se o token for inválido (403/401), desloga.
         if (response.status === 403 || response.status === 401) {
-            console.warn("Token inválido ou expirado. Deslogando...");
+            console.warn("Token inválido. Deslogando...");
             localStorage.removeItem("token");
             localStorage.removeItem("authToken");
             window.location.href = "login.html"; 
@@ -71,30 +67,26 @@ function setupLogout() {
             e.preventDefault();
             localStorage.removeItem("token");
             localStorage.removeItem("authToken");
-            alert("Você saiu da sua conta.");
             window.location.href = "login.html";
         });
     }
 }
 
 // =====================
-// 3. BARRA DE PESQUISA GLOBAL (COM FOTOS E FILTRO)
+// 3. BARRA DE PESQUISA (CORRIGIDA 🚀)
 // =====================
 function setupGlobalSearch() {
     const searchInput = document.getElementById("search-input");
     const resultsContainer = document.getElementById("global-search-results");
-
-    // Elementos do Filtro (Se existirem na página)
     const btnFiltro = document.getElementById("btn-filtro-home");
     const dropdownFiltro = document.getElementById("filter-dropdown-home");
     const opcoesFiltro = dropdownFiltro ? dropdownFiltro.querySelectorAll("a") : [];
     
-    // Variável de estado do filtro (Padrão: busca tudo)
     let filtroAtual = "todos"; 
 
     if (!searchInput || !resultsContainer) return;
 
-    // --- LÓGICA DO MENU FILTRO ---
+    // Toggle do Filtro
     if (btnFiltro && dropdownFiltro) {
         btnFiltro.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -107,19 +99,13 @@ function setupGlobalSearch() {
                 filtroAtual = e.target.getAttribute("data-value");
                 btnFiltro.innerHTML = `<i class="fas fa-filter"></i> ${e.target.textContent} <i class="fas fa-caret-down"></i>`;
                 dropdownFiltro.style.display = "none";
-
-                if (searchInput.value.trim().length >= 2) {
-                    fetchResults(searchInput.value);
-                }
+                if (searchInput.value.trim().length >= 2) fetchResults(searchInput.value);
             });
         });
 
-        document.addEventListener("click", () => {
-            dropdownFiltro.style.display = "none";
-        });
+        document.addEventListener("click", () => dropdownFiltro.style.display = "none");
     }
 
-    // --- LÓGICA DA BUSCA ---
     const debounce = (func, delay) => {
         let timeoutId;
         return (...args) => {
@@ -134,12 +120,8 @@ function setupGlobalSearch() {
             return;
         }
         try {
-            // Envia o filtro para o Java
             const url = `${API_URL}/perfis/buscar?q=${encodeURIComponent(query)}&filtro=${filtroAtual}`;
-            
-            const response = await fetch(url, {
-                headers: { 'Authorization': 'Bearer ' + token }
-            });
+            const response = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token } });
             
             if (!response.ok) throw new Error('Erro na busca');
             
@@ -162,39 +144,38 @@ function setupGlobalSearch() {
         }
 
         results.forEach(item => {
-            const fotoBanco = item.fotoPerfilUrl || item.fotoUrl || item.urlPerfil; 
+            // --- TRATAMENTO DE IMAGEM ---
+            // Tenta pegar a imagem de qualquer campo possível (DTOs variam)
+            const fotoBanco = item.fotoPerfilUrl || item.fotoUrl || item.imagemUrl || item.urlPerfil; 
             let fotoFinal = "assets/pictures/profile-pic.png"; 
 
             if (fotoBanco && fotoBanco.length > 5) { 
                 fotoFinal = fotoBanco.startsWith("http") ? fotoBanco : SERVER_URL + fotoBanco;
             }
 
-            // Lógica de Link e Formato (Pessoa vs Evento)
-            let linkDestino = `perfil.html?usuarioId=${item.id || item.usuarioId}`;
+            // --- CORREÇÃO DO LINK (AQUI ESTAVA O ERRO) ---
+            // O Java já manda o link pronto no campo 'link' (ex: "perfil.html?usuarioId=5")
+            // Se 'link' não existir, usamos um fallback, mas confiamos no Java primeiro.
+            let linkDestino = item.link; 
+            
+            // Definições visuais
             let imgRadius = "50%";
             let imgDefault = "assets/pictures/profile-pic.png";
 
-            // Se for evento (identificado pelo Java ou pelo filtro)
+            // Se for evento, ajustamos a aparência
             if (filtroAtual === 'eventos' || item.descricao === 'Evento') {
-                linkDestino = `detalhes-evento.html?id=${item.id}`;
-                imgRadius = "8px"; // Quadrado arredondado
-                imgDefault = "assets/pictures/liferay-devcon.jpg"; // Imagem de evento padrão
-                if(item.imagemUrl) fotoFinal = item.imagemUrl;
+                imgRadius = "8px"; 
+                imgDefault = "assets/pictures/liferay-devcon.jpg"; 
+                // Para eventos, o Java também já manda o link "detalhes-evento.html?id=..."
             }
 
             const link = document.createElement('a');
-            link.href = linkDestino;
+            link.href = linkDestino || "#"; // Evita href vazio
             
             link.style.cssText = `
-                display: flex; 
-                align-items: center; 
-                padding: 10px 15px; 
-                border-bottom: 1px solid #eee; 
-                text-decoration: none; 
-                color: #333; 
-                cursor: pointer;
-                background: #fff;
-                transition: background 0.2s;
+                display: flex; align-items: center; padding: 10px 15px; 
+                border-bottom: 1px solid #eee; text-decoration: none; 
+                color: #333; cursor: pointer; background: #fff; transition: background 0.2s;
             `;
             
             link.innerHTML = `

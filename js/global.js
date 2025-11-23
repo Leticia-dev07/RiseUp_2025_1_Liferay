@@ -10,12 +10,12 @@ const SERVER_URL = "https://back-end-riseup-liferay-5.onrender.com";
 const token = localStorage.getItem("token") || localStorage.getItem("authToken");
 
 // 2. Verificação de segurança (ATIVADA 🚀)
-// Se NÃO tem token E o usuário NÃO está na página de login ou criar conta...
+// Se NÃO tem token E o utilizador NÃO está na página de login ou criar conta...
 if (!token) {
     const path = window.location.pathname;
-    // Verifica se não estamos na página de login ou registro para evitar loop infinito
+    // Verifica se não estamos na página de login ou registo para evitar loop infinito
     if (!path.endsWith('login.html') && !path.endsWith('criar-conta.html')) {
-        window.location.href = "login.html"; // CHUTA PARA O LOGIN
+        window.location.href = "login.html"; // REDIRECIONA PARA O LOGIN
     }
 }
 
@@ -33,7 +33,7 @@ async function carregarDadosUsuario() {
 
         // 🌟 PROTEÇÃO EXTRA: Se o token for inválido (403/401), desloga.
         if (response.status === 403 || response.status === 401) {
-            console.warn("Token inválido ou expirado. Deslogando...");
+            console.warn("Token inválido ou expirado. A terminar sessão...");
             localStorage.removeItem("token");
             localStorage.removeItem("authToken");
             window.location.href = "login.html"; 
@@ -57,7 +57,7 @@ async function carregarDadosUsuario() {
                 : SERVER_URL + perfil.fotoPerfilUrl;
         }
     } catch (error) {
-        console.error("Erro ao carregar header:", error);
+        console.error("Erro ao carregar cabeçalho:", error);
     }
 }
 
@@ -71,7 +71,7 @@ function setupLogout() {
             e.preventDefault();
             localStorage.removeItem("token");
             localStorage.removeItem("authToken");
-            alert("Você saiu da sua conta.");
+            alert("Saiu da sua conta.");
             window.location.href = "login.html";
         });
     }
@@ -179,8 +179,14 @@ function setupGlobalSearch() {
             let idFinal = item.id || item.usuarioId;
             let linkDestino = item.link; // O Java agora manda o link no 4º campo
 
-            // Se o Java não mandou link (ou mandou vazio), montamos manualmente
-            if (!linkDestino) {
+            // Se o link não vier pronto ou estiver vazio, construímos manualmente
+            if (!linkDestino || linkDestino === "#" || linkDestino === "null") {
+                // Tenta extrair ID de strings se necessário
+                if (!idFinal && item.link) {
+                    const match = item.link.match(/id=(\d+)/) || item.link.match(/usuarioId=(\d+)/);
+                    if (match) idFinal = match[1];
+                }
+
                 if (filtroAtual === 'eventos' || item.descricao === 'Evento') {
                     linkDestino = idFinal ? `detalhes-evento.html?id=${idFinal}` : "#";
                 } else {

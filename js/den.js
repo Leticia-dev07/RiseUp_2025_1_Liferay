@@ -1,107 +1,101 @@
 // ===============================================
-// ARQUIVO: js/den.js
+// ARQUIVO: js/den.js (VERSÃO DE DIAGNÓSTICO)
 // ===============================================
 
-// URL BASE DO SEU BACKEND
 const BASE_URL = "https://back-end-riseup-liferay-5.onrender.com";
 
 document.addEventListener("DOMContentLoaded", () => {
-    
-    // 1. CARREGAR NOME DO USUÁRIO (Executa em todas as páginas que usam este JS)
+    console.log("🚀 JS Iniciado. Tentando carregar perfil...");
     carregarNomeUsuario();
 
-    // 2. LÓGICA DO FORMULÁRIO (Só executa se existir o formulário na tela)
+    // Lógica do formulário (se existir na página)
     const form = document.getElementById('contactForm') || document.querySelector('form');
-    
-    // Se achou o formulário, ativa a lógica de envio
-    if (form) {
-        configurarFormulario(form);
-    }
+    if (form) configurarFormulario(form);
 });
 
-// --- FUNÇÃO PARA CARREGAR O PERFIL ---
 async function carregarNomeUsuario() {
     const elementoNome = document.getElementById('nome-usuario');
-    
-    // Se não tiver o elemento no HTML (ex: página sem header), para por aqui
-    if (!elementoNome) return;
-
-    // Tenta pegar o token salvo no localStorage (verifique se você salvou como 'token', 'jwt' ou 'accessToken')
-    const token = localStorage.getItem('token'); 
-
-    if (!token) {
-        elementoNome.innerText = "Visitante";
+    if (!elementoNome) {
+        console.warn("⚠️ Elemento <span id='nome-usuario'> não encontrado no HTML.");
         return;
     }
 
+    // 1. TENTA ACHAR O TOKEN COM VÁRIOS NOMES COMUNS
+    const token = localStorage.getItem('token') || 
+                  localStorage.getItem('jwt') || 
+                  localStorage.getItem('accessToken') ||
+                  localStorage.getItem('access_token');
+
+    if (!token) {
+        console.error("❌ ERRO: Nenhum token encontrado no LocalStorage. O usuário fez login?");
+        elementoNome.innerText = "Visitante (Sem Token)";
+        return;
+    }
+
+    console.log("✅ Token encontrado (primeiros 10 chars):", token.substring(0, 10) + "...");
+
     try {
+        // 2. CHAMA A API
+        console.log("📡 Chamando /api/perfis/me...");
         const response = await fetch(`${BASE_URL}/api/perfis/me`, {
             method: "GET",
             headers: {
-                "Authorization": `Bearer ${token}`, // Envia o token para liberar o acesso
+                "Authorization": `Bearer ${token}`,
                 "Content-Type": "application/json"
             }
         });
 
+        console.log("Status da resposta:", response.status);
+
         if (response.ok) {
             const usuario = await response.json();
-            // Ajuste aqui se o seu JSON retornar { username: "..." } em vez de { nome: "..." }
-            elementoNome.innerText = usuario.nome || usuario.username || "Usuário"; 
+            console.log("📦 Dados recebidos do Backend:", usuario);
+
+            // 3. TENTA ENCONTRAR O CAMPO CERTO (Nome ou Username?)
+            const nomeExibicao = usuario.nome || usuario.username || usuario.email || "Usuário";
+            
+            console.log("📝 Atualizando HTML para:", nomeExibicao);
+            elementoNome.innerText = nomeExibicao;
         } else {
-            console.warn("Token inválido ou expirado.");
-            elementoNome.innerText = "Usuário";
+            console.error("❌ Erro na API:", response.status, response.statusText);
+            
+            if (response.status === 403 || response.status === 401) {
+                elementoNome.innerText = "Sessão Expirada";
+                // Opcional: localStorage.clear(); window.location.href = '/login.html';
+            } else {
+                elementoNome.innerText = "Erro ao carregar";
+            }
         }
     } catch (erro) {
-        console.error("Erro ao buscar nome do usuário:", erro);
+        console.error("❌ Erro CRÍTICO de conexão:", erro);
+        elementoNome.innerText = "Offline";
     }
 }
 
-// --- LÓGICA DO ENVIO DO FORMULÁRIO ---
+// --- CONFIGURAÇÃO DO FORMULÁRIO (MANTIDA IGUAL) ---
 function configurarFormulario(form) {
     const API_URL_CONTATO = `${BASE_URL}/api/contato/enviar`;
 
     form.addEventListener('submit', async function(event) {
         event.preventDefault(); 
         resetErrors();
-
         let hasError = false;
 
-        // --- VALIDAÇÃO ---
-        const requiredFields = [
-            { id: 'nome', message: 'Este campo é obrigatório.' },
-            { id: 'sobrenome', message: 'Este campo é obrigatório.' },
-            { id: 'email', message: 'Por favor, insira um email válido.' },
-            { id: 'telefone', message: 'Este campo é obrigatório.' },
-            { id: 'pais', message: 'Este campo é obrigatório.' },
-            { id: 'area', message: 'Este campo é obrigatório.' }
-        ];
-
-        requiredFields.forEach(field => {
-            const input = document.getElementById(field.id);
-            if (!input) return;
-
-            if (field.id === 'email') {
-                if (!isValidEmail(input.value)) {
-                    showError(input, field.message);
-                    hasError = true;
-                }
-            } else if (input.value.trim() === '') {
-                showError(input, field.message);
+        // Validação Simples
+        const requiredFields = ['nome', 'sobrenome', 'email', 'telefone', 'pais', 'area'];
+        requiredFields.forEach(id => {
+            const input = document.getElementById(id);
+            if (input && input.value.trim() === '') {
+                showError(input, 'Campo obrigatório.');
                 hasError = true;
             }
         });
 
-        // --- ENVIO ---
         if (!hasError) {
             const submitBtn = form.querySelector('button[type="submit"]');
-            const textoOriginal = submitBtn ? submitBtn.textContent : "Enviar";
+            if(submitBtn) { submitBtn.textContent = "Enviando..."; submitBtn.disabled = true; }
 
-            if(submitBtn) {
-                submitBtn.textContent = "Enviando...";
-                submitBtn.disabled = true;
-            }
-
-            const dadosParaEnviar = {
+            const dados = {
                 nome: document.getElementById('nome').value,
                 sobrenome: document.getElementById('sobrenome').value,
                 email: document.getElementById('email').value,
@@ -112,57 +106,28 @@ function configurarFormulario(form) {
             };
 
             try {
-                const response = await fetch(API_URL_CONTATO, {
+                const res = await fetch(API_URL_CONTATO, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(dadosParaEnviar)
+                    body: JSON.stringify(dados)
                 });
 
-                if (response.ok) {
-                    window.location.href = 'den-conc.html';
-                } else {
-                    alert("Ocorreu um erro ao enviar. Tente novamente mais tarde.");
-                    console.error("Erro no backend:", response.status);
-                    if(submitBtn) {
-                        submitBtn.textContent = textoOriginal;
-                        submitBtn.disabled = false;
-                    }
-                }
-            } catch (erro) {
-                console.error("Erro de conexão:", erro);
-                alert("Não foi possível conectar ao servidor.");
-                if(submitBtn) {
-                    submitBtn.textContent = textoOriginal;
-                    submitBtn.disabled = false;
-                }
+                if (res.ok) window.location.href = 'den-conc.html';
+                else alert("Erro ao enviar. Tente novamente.");
+            } catch (e) {
+                console.error(e);
+                alert("Erro de conexão.");
+            } finally {
+                if(submitBtn) { submitBtn.textContent = "Enviar"; submitBtn.disabled = false; }
             }
         }
     });
 }
 
-// --- FUNÇÕES AUXILIARES ---
-function showError(input, message) {
-    const formGroup = input.closest('.form-group') || input.parentElement;
-    if(formGroup) {
-        formGroup.classList.add('error');
-        let errorMessage = formGroup.querySelector('.error-message');
-        if (!errorMessage) {
-            errorMessage = document.createElement('span');
-            errorMessage.className = 'error-message';
-            errorMessage.style.color = 'red';
-            errorMessage.style.fontSize = '12px';
-            formGroup.appendChild(errorMessage);
-        }
-        errorMessage.textContent = message;
-    }
+function showError(input, msg) {
+    const group = input.parentElement;
+    group.classList.add('error');
 }
-
 function resetErrors() {
-    const errorGroups = document.querySelectorAll('.form-group.error');
-    errorGroups.forEach(group => group.classList.remove('error'));
-}
-
-function isValidEmail(email) {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
+    document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
 }

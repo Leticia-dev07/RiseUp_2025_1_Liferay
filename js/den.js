@@ -1,24 +1,23 @@
 // ===============================================
-// ARQUIVO: js/contato.js (VALIDAÇÃO E REDIRECIONAMENTO)
+// ARQUIVO: js/den.js
 // ===============================================
 
+// URL JÁ CONFIGURADA COM SEU BACKEND NO RENDER
+const API_URL = "https://back-end-riseup-liferay-5.onrender.com/api/contato/enviar";
+
 document.addEventListener("DOMContentLoaded", () => {
-    // Seleciona o formulário pelo ID (verifique se no HTML é 'contactForm' ou apenas <form>)
     const form = document.getElementById('contactForm') || document.querySelector('form');
 
     if (!form) return;
 
-    form.addEventListener('submit', function(event) {
+    form.addEventListener('submit', async function(event) {
         
-        // 1. Impede o envio padrão para validar primeiro
-        event.preventDefault();
-
-        // 2. Limpa erros antigos
-        resetErrors();
+        event.preventDefault(); // Impede o envio padrão do navegador
+        resetErrors();          // Limpa mensagens de erro antigas
 
         let hasError = false;
 
-        // 3. Lista de campos obrigatórios (IDs devem bater com o HTML)
+        // --- VALIDAÇÃO ---
         const requiredFields = [
             { id: 'nome', message: 'Este campo é obrigatório.' },
             { id: 'sobrenome', message: 'Este campo é obrigatório.' },
@@ -28,59 +27,97 @@ document.addEventListener("DOMContentLoaded", () => {
             { id: 'area', message: 'Este campo é obrigatório.' }
         ];
 
-        // 4. Loop de validação
         requiredFields.forEach(field => {
             const input = document.getElementById(field.id);
-            
-            // Se não achou o input no HTML, pula (evita erro de null)
             if (!input) return;
 
+            // Validação de Email
             if (field.id === 'email') {
                 if (!isValidEmail(input.value)) {
                     showError(input, field.message);
                     hasError = true;
                 }
             } 
+            // Validação de Campos Vazios
             else if (input.value.trim() === '') {
                 showError(input, field.message);
                 hasError = true;
             }
         });
 
-        // 5. SE TUDO ESTIVER CERTO -> REDIRECIONA!
+        // --- ENVIO PARA O SERVIDOR ---
         if (!hasError) {
-            // Simula um envio rápido (pode adicionar loading se quiser)
             const submitBtn = form.querySelector('button[type="submit"]');
+            const textoOriginal = submitBtn ? submitBtn.textContent : "Enviar";
+
+            // 1. Feedback visual (Botão carregando)
             if(submitBtn) {
                 submitBtn.textContent = "Enviando...";
                 submitBtn.disabled = true;
             }
 
-            // Pequeno delay para UX (opcional), depois redireciona
-            setTimeout(() => {
-                window.location.href = 'den-conc.html';
-            }, 500);
+            // 2. Monta o Objeto JSON
+            const dadosParaEnviar = {
+                nome: document.getElementById('nome').value,
+                sobrenome: document.getElementById('sobrenome').value,
+                email: document.getElementById('email').value,
+                telefone: document.getElementById('telefone').value,
+                pais: document.getElementById('pais').value,
+                areaTrabalho: document.getElementById('area').value, // Mapeado: HTML 'area' -> Java 'areaTrabalho'
+                motivo: document.getElementById('motivo').value
+            };
+
+            try {
+                // 3. Conexão real com o Render
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(dadosParaEnviar)
+                });
+
+                if (response.ok) {
+                    // SUCESSO: Redireciona
+                    window.location.href = 'den-conc.html';
+                } else {
+                    // ERRO DO SERVIDOR (Ex: 400 ou 500)
+                    alert("Ocorreu um erro ao enviar. Tente novamente mais tarde.");
+                    console.error("Erro no backend:", response.status);
+                    
+                    if(submitBtn) {
+                        submitBtn.textContent = textoOriginal;
+                        submitBtn.disabled = false;
+                    }
+                }
+            } catch (erro) {
+                // ERRO DE CONEXÃO (Internet ou Servidor Offline)
+                console.error("Erro de conexão:", erro);
+                alert("Não foi possível conectar ao servidor.");
+                
+                if(submitBtn) {
+                    submitBtn.textContent = textoOriginal;
+                    submitBtn.disabled = false;
+                }
+            }
         }
     });
 });
 
-// --- FUNÇÕES AUXILIARES ---
+// --- FUNÇÕES DE APOIO ---
 
 function showError(input, message) {
-    // Tenta achar o pai .form-group ou usa o pai direto
     const formGroup = input.closest('.form-group') || input.parentElement;
     if(formGroup) {
         formGroup.classList.add('error');
         
-        // Procura o span de erro ou cria um se não existir
         let errorMessage = formGroup.querySelector('.error-message');
         if (!errorMessage) {
             errorMessage = document.createElement('span');
             errorMessage.className = 'error-message';
+            // Estilos inline de fallback caso o CSS falhe
             errorMessage.style.color = 'red';
             errorMessage.style.fontSize = '12px';
-            errorMessage.style.display = 'block';
-            errorMessage.style.marginTop = '5px';
             formGroup.appendChild(errorMessage);
         }
         errorMessage.textContent = message;
@@ -88,11 +125,12 @@ function showError(input, message) {
 }
 
 function resetErrors() {
-    const errorGroups = document.querySelectorAll('.error');
+    const errorGroups = document.querySelectorAll('.form-group.error');
     errorGroups.forEach(group => {
         group.classList.remove('error');
         const msg = group.querySelector('.error-message');
-        if (msg) msg.textContent = '';
+        // Opcional: limpar texto
+        // if (msg) msg.textContent = ''; 
     });
 }
 

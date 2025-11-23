@@ -22,8 +22,10 @@ async function carregarNomeUsuario() {
     const elementoNome = document.getElementById('nome-usuario');
     if (!elementoNome) return; // Se não tiver header, ignora
 
-    // Tenta pegar o token (Verifique se no seu login você salva como 'token', 'jwt' ou 'accessToken')
-    const token = localStorage.getItem('token') || localStorage.getItem('jwt'); 
+    // Tenta pegar o token: PRIORIZA 'authToken', que é a chave correta no seu LocalStorage.
+    const token = localStorage.getItem('authToken') || // Chave corrigida!
+                  localStorage.getItem('token') || 
+                  localStorage.getItem('jwt'); 
 
     if (!token) {
         elementoNome.innerText = "Visitante"; // Ou redirecione para login
@@ -44,8 +46,8 @@ async function carregarNomeUsuario() {
             // Pega o nome, ou username, ou email (o que tiver disponível)
             elementoNome.innerText = usuario.nome || usuario.username || "Usuário"; 
         } else {
-            // Token expirado ou inválido
-            console.warn("Sessão inválida.");
+            // Token expirado ou inválido (ex: 401 Unauthorized)
+            console.warn("Sessão inválida. Status:", response.status);
             elementoNome.innerText = "Faça Login";
         }
     } catch (erro) {
@@ -56,7 +58,9 @@ async function carregarNomeUsuario() {
 
 // --- FUNÇÃO: ENVIAR FORMULÁRIO ---
 function configurarFormulario(form) {
-    const API_URL_CONTATO = `${BASE_URL}/api/contato/enviar`;
+    // Atenção: Seu console mostrou erro 403 (Forbidden) no POST /api/contato/enviar
+    // A rota está correta, mas pode ser que o backend exija um token para o POST.
+    const API_URL_CONTATO = `${BASE_URL}/api/contato/enviar`; 
 
     form.addEventListener('submit', async function(event) {
         event.preventDefault(); 
@@ -105,25 +109,34 @@ function configurarFormulario(form) {
                 areaTrabalho: document.getElementById('area').value, 
                 motivo: document.getElementById('motivo').value
             };
+            
+            // Re-busca o token para o envio do formulário, caso o backend exija autenticação
+            const token = localStorage.getItem('authToken');
+            
+            const headers = { "Content-Type": "application/json" };
+            if (token) {
+                // Adiciona o token, caso o backend de contato exija (por causa do erro 403 visto)
+                headers["Authorization"] = `Bearer ${token}`;
+            }
 
             try {
                 const response = await fetch(API_URL_CONTATO, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: headers,
                     body: JSON.stringify(dados)
                 });
 
                 if (response.ok) {
                     window.location.href = 'den-conc.html';
                 } else {
-                    alert("Erro ao enviar. Tente novamente.");
+                    alert(`Erro ao enviar. Status: ${response.status}. Tente novamente.`);
                     if(submitBtn) {
                         submitBtn.textContent = textoOriginal;
                         submitBtn.disabled = false;
                     }
                 }
             } catch (erro) {
-                console.error(erro);
+                console.error("Erro de conexão ou rede:", erro);
                 alert("Erro de conexão.");
                 if(submitBtn) {
                     submitBtn.textContent = textoOriginal;

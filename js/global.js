@@ -1,23 +1,26 @@
 // ===============================================
-// ARQUIVO: js/global.js (CORRIGIDO PARA BUSCA)
+// ARQUIVO: js/global.js (VERSÃO FINAL CORRIGIDA)
 // ===============================================
 
-// 1. Definições globais
+// 1. Definições globais - ATUALIZADAS PARA O SERVIDOR RENDER
 const API_URL = "https://back-end-riseup-liferay-5.onrender.com/api"; 
 const SERVER_URL = "https://back-end-riseup-liferay-5.onrender.com";
 
+// Tenta pegar o token (verifica ambos os nomes comuns para garantir)
 const token = localStorage.getItem("token") || localStorage.getItem("authToken");
 
-// 2. Proteção de Rota
+// 2. Verificação de segurança (ATIVADA 🚀)
+// Se NÃO tem token E o usuário NÃO está na página de login ou criar conta...
 if (!token) {
     const path = window.location.pathname;
+    // Verifica se não estamos na página de login ou registro para evitar loop infinito
     if (!path.endsWith('login.html') && !path.endsWith('criar-conta.html')) {
-        window.location.href = "login.html";
+        window.location.href = "login.html"; // CHUTA PARA O LOGIN
     }
 }
 
 // =====================
-// 1. CARREGAR DADOS DO CABEÇALHO
+// 1. CARREGAR DADOS DO CABEÇALHO (FOTO E NOME)
 // =====================
 async function carregarDadosUsuario() {
     if (!token) return; 
@@ -28,8 +31,9 @@ async function carregarDadosUsuario() {
             headers: { Authorization: "Bearer " + token },
         });
 
+        // 🌟 PROTEÇÃO EXTRA: Se o token for inválido (403/401), desloga.
         if (response.status === 403 || response.status === 401) {
-            console.warn("Token inválido. Deslogando...");
+            console.warn("Token inválido ou expirado. Deslogando...");
             localStorage.removeItem("token");
             localStorage.removeItem("authToken");
             window.location.href = "login.html"; 
@@ -67,26 +71,30 @@ function setupLogout() {
             e.preventDefault();
             localStorage.removeItem("token");
             localStorage.removeItem("authToken");
+            alert("Você saiu da sua conta.");
             window.location.href = "login.html";
         });
     }
 }
 
 // =====================
-// 3. BARRA DE PESQUISA (CORRIGIDA 🚀)
+// 3. BARRA DE PESQUISA GLOBAL (COM FOTOS E FILTRO)
 // =====================
 function setupGlobalSearch() {
     const searchInput = document.getElementById("search-input");
     const resultsContainer = document.getElementById("global-search-results");
+
+    // Elementos do Filtro (Se existirem na página)
     const btnFiltro = document.getElementById("btn-filtro-home");
     const dropdownFiltro = document.getElementById("filter-dropdown-home");
     const opcoesFiltro = dropdownFiltro ? dropdownFiltro.querySelectorAll("a") : [];
     
+    // Variável de estado do filtro (Padrão: busca tudo)
     let filtroAtual = "todos"; 
 
     if (!searchInput || !resultsContainer) return;
 
-    // Toggle do Filtro
+    // --- LÓGICA DO MENU FILTRO ---
     if (btnFiltro && dropdownFiltro) {
         btnFiltro.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -99,13 +107,19 @@ function setupGlobalSearch() {
                 filtroAtual = e.target.getAttribute("data-value");
                 btnFiltro.innerHTML = `<i class="fas fa-filter"></i> ${e.target.textContent} <i class="fas fa-caret-down"></i>`;
                 dropdownFiltro.style.display = "none";
-                if (searchInput.value.trim().length >= 2) fetchResults(searchInput.value);
+
+                if (searchInput.value.trim().length >= 2) {
+                    fetchResults(searchInput.value);
+                }
             });
         });
 
-        document.addEventListener("click", () => dropdownFiltro.style.display = "none");
+        document.addEventListener("click", () => {
+            dropdownFiltro.style.display = "none";
+        });
     }
 
+    // --- LÓGICA DA BUSCA ---
     const debounce = (func, delay) => {
         let timeoutId;
         return (...args) => {
@@ -120,8 +134,12 @@ function setupGlobalSearch() {
             return;
         }
         try {
+            // Envia o filtro para o Java
             const url = `${API_URL}/perfis/buscar?q=${encodeURIComponent(query)}&filtro=${filtroAtual}`;
-            const response = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token } });
+            
+            const response = await fetch(url, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
             
             if (!response.ok) throw new Error('Erro na busca');
             
@@ -134,6 +152,7 @@ function setupGlobalSearch() {
         }
     };
 
+    // 🚀 FUNÇÃO DE RENDERIZAÇÃO CORRIGIDA (Resolve o problema do link)
     const renderResults = (results) => {
         resultsContainer.innerHTML = ""; 
 
@@ -144,8 +163,7 @@ function setupGlobalSearch() {
         }
 
         results.forEach(item => {
-            // --- TRATAMENTO DE IMAGEM ---
-            // Tenta pegar a imagem de qualquer campo possível (DTOs variam)
+            // --- 1. IMAGEM ---
             const fotoBanco = item.fotoPerfilUrl || item.fotoUrl || item.imagemUrl || item.urlPerfil; 
             let fotoFinal = "assets/pictures/profile-pic.png"; 
 
@@ -153,24 +171,41 @@ function setupGlobalSearch() {
                 fotoFinal = fotoBanco.startsWith("http") ? fotoBanco : SERVER_URL + fotoBanco;
             }
 
-            // --- CORREÇÃO DO LINK (AQUI ESTAVA O ERRO) ---
-            // O Java já manda o link pronto no campo 'link' (ex: "perfil.html?usuarioId=5")
-            // Se 'link' não existir, usamos um fallback, mas confiamos no Java primeiro.
-            let linkDestino = item.link; 
+            // --- 2. EXTRAÇÃO DO ID E LINK (BLINDADO) ---
+            let idFinal = item.id || item.usuarioId;
             
-            // Definições visuais
+            // Se o ID não vier direto, tenta extrair do link que o Java mandou
+            if (!idFinal && item.link) {
+                const match = item.link.match(/id=(\d+)/) || item.link.match(/usuarioId=(\d+)/);
+                if (match) idFinal = match[1];
+            }
+
+            let linkDestino = "#";
+
+            // Decide o destino baseado no tipo de item
+            if (filtroAtual === 'eventos' || item.descricao === 'Evento') {
+                linkDestino = idFinal ? `detalhes-evento.html?id=${idFinal}` : "#";
+            } else {
+                linkDestino = idFinal ? `perfil.html?usuarioId=${idFinal}` : "#";
+            }
+
+            // Se o Java mandou um link pronto e confiável, usa ele como fallback
+            if (linkDestino === "#" && item.link && item.link.includes(".html")) {
+                linkDestino = item.link;
+            }
+
+            // --- 3. ESTILOS ---
             let imgRadius = "50%";
             let imgDefault = "assets/pictures/profile-pic.png";
 
-            // Se for evento, ajustamos a aparência
             if (filtroAtual === 'eventos' || item.descricao === 'Evento') {
                 imgRadius = "8px"; 
-                imgDefault = "assets/pictures/liferay-devcon.jpg"; 
-                // Para eventos, o Java também já manda o link "detalhes-evento.html?id=..."
+                imgDefault = "assets/pictures/liferay-devcon.jpg"; // Imagem de evento padrão
             }
 
+            // --- 4. MONTAGEM DO HTML ---
             const link = document.createElement('a');
-            link.href = linkDestino || "#"; // Evita href vazio
+            link.href = linkDestino;
             
             link.style.cssText = `
                 display: flex; align-items: center; padding: 10px 15px; 
@@ -192,6 +227,11 @@ function setupGlobalSearch() {
             
             link.onmouseover = () => link.style.background = "#f9f9f9";
             link.onmouseout = () => link.style.background = "#fff";
+
+            // Fecha o menu ao clicar
+            link.onclick = () => {
+                resultsContainer.style.display = 'none';
+            };
 
             resultsContainer.appendChild(link);
         });

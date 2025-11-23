@@ -152,7 +152,7 @@ function setupGlobalSearch() {
         }
     };
 
-    // 🚀 FUNÇÃO DE RENDERIZAÇÃO CORRIGIDA (Resolve o problema do link)
+    // 🚀 FUNÇÃO DE RENDERIZAÇÃO CORRIGIDA (Resolve o problema do link e foto)
     const renderResults = (results) => {
         resultsContainer.innerHTML = ""; 
 
@@ -164,34 +164,28 @@ function setupGlobalSearch() {
 
         results.forEach(item => {
             // --- 1. IMAGEM ---
-            const fotoBanco = item.fotoPerfilUrl || item.fotoUrl || item.imagemUrl || item.urlPerfil; 
+            // O Java agora manda a URL da foto no 3º campo do DTO (imagemUrl).
+            // Verificamos todos os possíveis nomes para garantir.
+            const fotoBanco = item.imagemUrl || item.fotoPerfilUrl || item.fotoUrl || item.urlPerfil; 
             let fotoFinal = "assets/pictures/profile-pic.png"; 
 
             if (fotoBanco && fotoBanco.length > 5) { 
+                // Se já começar com http (Cloudinary), usa direto.
+                // Se começar com / (antigo local), adiciona o domínio do servidor.
                 fotoFinal = fotoBanco.startsWith("http") ? fotoBanco : SERVER_URL + fotoBanco;
             }
 
             // --- 2. EXTRAÇÃO DO ID E LINK (BLINDADO) ---
             let idFinal = item.id || item.usuarioId;
-            
-            // Se o ID não vier direto, tenta extrair do link que o Java mandou
-            if (!idFinal && item.link) {
-                const match = item.link.match(/id=(\d+)/) || item.link.match(/usuarioId=(\d+)/);
-                if (match) idFinal = match[1];
-            }
+            let linkDestino = item.link; // O Java agora manda o link no 4º campo
 
-            let linkDestino = "#";
-
-            // Decide o destino baseado no tipo de item
-            if (filtroAtual === 'eventos' || item.descricao === 'Evento') {
-                linkDestino = idFinal ? `detalhes-evento.html?id=${idFinal}` : "#";
-            } else {
-                linkDestino = idFinal ? `perfil.html?usuarioId=${idFinal}` : "#";
-            }
-
-            // Se o Java mandou um link pronto e confiável, usa ele como fallback
-            if (linkDestino === "#" && item.link && item.link.includes(".html")) {
-                linkDestino = item.link;
+            // Se o Java não mandou link (ou mandou vazio), montamos manualmente
+            if (!linkDestino) {
+                if (filtroAtual === 'eventos' || item.descricao === 'Evento') {
+                    linkDestino = idFinal ? `detalhes-evento.html?id=${idFinal}` : "#";
+                } else {
+                    linkDestino = idFinal ? `perfil.html?usuarioId=${idFinal}` : "#";
+                }
             }
 
             // --- 3. ESTILOS ---

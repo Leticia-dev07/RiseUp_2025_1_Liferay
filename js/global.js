@@ -1,5 +1,5 @@
 // ===============================================
-// ARQUIVO: js/global.js (VERSÃO FINAL CORRIGIDA)
+// ARQUIVO: js/global.js (VERSÃO FINAL CORRIGIDA E ROBUSTA)
 // ===============================================
 
 // 1. Definições globais - ATUALIZADAS PARA O SERVIDOR RENDER
@@ -15,7 +15,8 @@ if (!token) {
     const path = window.location.pathname;
     // Verifica se não estamos na página de login ou registo para evitar loop infinito
     if (!path.endsWith('login.html') && !path.endsWith('criar-conta.html')) {
-        window.location.href = "login.html"; // REDIRECIONA PARA O LOGIN
+        console.warn("Sem token, redirecionando para login.");
+        window.location.href = "login.html"; // CHUTA PARA O LOGIN
     }
 }
 
@@ -33,7 +34,7 @@ async function carregarDadosUsuario() {
 
         // 🌟 PROTEÇÃO EXTRA: Se o token for inválido (403/401), desloga.
         if (response.status === 403 || response.status === 401) {
-            console.warn("Token inválido ou expirado. A terminar sessão...");
+            console.warn("Token inválido ou expirado. Deslogando...");
             localStorage.removeItem("token");
             localStorage.removeItem("authToken");
             window.location.href = "login.html"; 
@@ -52,12 +53,15 @@ async function carregarDadosUsuario() {
         }
 
         if (userImage && perfil.fotoPerfilUrl) {
-            userImage.src = perfil.fotoPerfilUrl.startsWith("http") 
-                ? perfil.fotoPerfilUrl 
-                : SERVER_URL + perfil.fotoPerfilUrl;
+            let fotoUrl = perfil.fotoPerfilUrl;
+            // Se for link local (/fotos/...), adiciona o domínio. Se for http (Cloudinary), usa direto.
+            if (!fotoUrl.startsWith("http")) {
+                fotoUrl = SERVER_URL + (fotoUrl.startsWith("/") ? "" : "/") + fotoUrl;
+            }
+            userImage.src = fotoUrl;
         }
     } catch (error) {
-        console.error("Erro ao carregar cabeçalho:", error);
+        console.error("Erro ao carregar header:", error);
     }
 }
 
@@ -71,7 +75,7 @@ function setupLogout() {
             e.preventDefault();
             localStorage.removeItem("token");
             localStorage.removeItem("authToken");
-            alert("Saiu da sua conta.");
+            alert("Você saiu da sua conta.");
             window.location.href = "login.html";
         });
     }
@@ -144,6 +148,7 @@ function setupGlobalSearch() {
             if (!response.ok) throw new Error('Erro na busca');
             
             const data = await response.json();
+            console.log("Resultados da busca:", data); // DEBUG
             renderResults(data);
 
         } catch (error) {
@@ -152,7 +157,7 @@ function setupGlobalSearch() {
         }
     };
 
-    // 🚀 FUNÇÃO DE RENDERIZAÇÃO CORRIGIDA (Resolve o problema do link e foto)
+    // 🚀 FUNÇÃO DE RENDERIZAÇÃO (CORRIGIDA E SEGURA)
     const renderResults = (results) => {
         resultsContainer.innerHTML = ""; 
 
@@ -163,47 +168,73 @@ function setupGlobalSearch() {
         }
 
         results.forEach(item => {
-            // --- 1. IMAGEM ---
-            // O Java agora manda a URL da foto no 3º campo do DTO (imagemUrl).
-            // Verificamos todos os possíveis nomes para garantir.
-            const fotoBanco = item.imagemUrl || item.fotoPerfilUrl || item.fotoUrl || item.urlPerfil; 
-            let fotoFinal = "assets/pictures/profile-pic.png"; 
+            // === 1. IDENTIFICAÇÃO INTELIGENTE DE CAMPOS ===
+            const rawImg = item.imagemUrl || item.fotoPerfilUrl || item.fotoUrl || item.urlPerfil;
+            const rawLink = item.link;
 
-            if (fotoBanco && fotoBanco.length > 5) { 
-                // Se já começar com http (Cloudinary), usa direto.
-                // Se começar com / (antigo local), adiciona o domínio do servidor.
-                fotoFinal = fotoBanco.startsWith("http") ? fotoBanco : SERVER_URL + fotoBanco;
+            let fotoFinal = "assets/pictures/profile-pic.png";
+            let linkDestino = "#";
+
+            // Funções para identificar o conteúdo
+            // Link: contém .html ou ?id=
+            const isLink = (val) => val && typeof val === 'string' && (val.includes(".html") || val.includes("?id=") || val.includes("usuarioId="));
+            // Imagem: contém cloudinary, /fotos/ ou extensões de imagem
+            const isImage = (val) => val && typeof val === 'string' && !val.includes(".html") && (val.includes("cloudinary") || val.includes("/fotos/") || val.match(/\.(jpg|jpeg|png|gif)$/i));
+
+            // === 2. ATRIBUIÇÃO CRUZADA (CORREÇÃO DE DADOS TROCADOS) ===
+            let foundImg = null;
+            let foundLink = null;
+
+            // Tenta achar a imagem no campo de imagem OU no campo de link
+            if (isImage(rawImg)) foundImg = rawImg;
+            else if (isImage(rawLink)) foundImg = rawLink;
+
+            // Tenta achar o link no campo de link OU no campo de imagem
+            if (isLink(rawLink)) foundLink = rawLink;
+            else if (isLink(rawImg)) foundLink = rawImg;
+
+            // === 3. PROCESSAMENTO DA FOTO ===
+            if (foundImg) {
+                if (foundImg.startsWith("http")) {
+                    fotoFinal = foundImg; // URL Completa (Cloudinary)
+                } else {
+                    // URL Relativa (Local) - Adiciona barra se faltar
+                    fotoFinal = SERVER_URL + (foundImg.startsWith("/") ? "" : "/") + foundImg;
+                }
             }
 
-            // --- 2. EXTRAÇÃO DO ID E LINK (BLINDADO) ---
-            let idFinal = item.id || item.usuarioId;
-            let linkDestino = item.link; // O Java agora manda o link no 4º campo
-
-            // Se o link não vier pronto ou estiver vazio, construímos manualmente
-            if (!linkDestino || linkDestino === "#" || linkDestino === "null") {
+            // === 4. PROCESSAMENTO DO LINK ===
+            if (foundLink) {
+                linkDestino = foundLink;
+            } else {
+                // Se não achou link pronto, monta manualmente pelo ID
+                let idFinal = item.id || item.usuarioId;
+                
                 // Tenta extrair ID de strings se necessário
-                if (!idFinal && item.link) {
-                    const match = item.link.match(/id=(\d+)/) || item.link.match(/usuarioId=(\d+)/);
+                if (!idFinal && rawLink) {
+                    const match = rawLink.match(/(\d+)/);
                     if (match) idFinal = match[1];
                 }
 
-                if (filtroAtual === 'eventos' || item.descricao === 'Evento') {
-                    linkDestino = idFinal ? `detalhes-evento.html?id=${idFinal}` : "#";
-                } else {
-                    linkDestino = idFinal ? `perfil.html?usuarioId=${idFinal}` : "#";
+                if (idFinal) {
+                    if (filtroAtual === 'eventos' || item.descricao === 'Evento') {
+                        linkDestino = `detalhes-evento.html?id=${idFinal}`;
+                    } else {
+                        linkDestino = `perfil.html?usuarioId=${idFinal}`;
+                    }
                 }
             }
 
-            // --- 3. ESTILOS ---
+            // === 5. ESTILOS ===
             let imgRadius = "50%";
             let imgDefault = "assets/pictures/profile-pic.png";
 
             if (filtroAtual === 'eventos' || item.descricao === 'Evento') {
                 imgRadius = "8px"; 
-                imgDefault = "assets/pictures/liferay-devcon.jpg"; // Imagem de evento padrão
+                imgDefault = "assets/pictures/liferay-devcon.jpg"; 
             }
 
-            // --- 4. MONTAGEM DO HTML ---
+            // === 6. CRIAÇÃO DO ELEMENTO HTML ===
             const link = document.createElement('a');
             link.href = linkDestino;
             
@@ -228,7 +259,6 @@ function setupGlobalSearch() {
             link.onmouseover = () => link.style.background = "#f9f9f9";
             link.onmouseout = () => link.style.background = "#fff";
 
-            // Fecha o menu ao clicar
             link.onclick = () => {
                 resultsContainer.style.display = 'none';
             };

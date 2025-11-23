@@ -1,8 +1,8 @@
 // ===============================================
-// ARQUIVO: js/den.js (VERSÃO FINAL)
+// ARQUIVO: js/den.js (VERSÃO COMPLETA E CORRIGIDA)
 // ===============================================
 
-// URL DO SEU BACKEND NO RENDER
+// URL DO SEU BACKEND NO RENDER (usada para todas as chamadas)
 const BASE_URL = "https://back-end-riseup-liferay-5.onrender.com";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 1. Carrega o nome do usuário assim que a página abre
     carregarNomeUsuario();
 
-    // 2. Configura o formulário (se existir nesta página)
+    // 2. Configura o formulário (só executa se houver um formulário com id='contactForm')
     const form = document.getElementById('contactForm') || document.querySelector('form');
     if (form) {
         configurarFormulario(form);
@@ -20,15 +20,15 @@ document.addEventListener("DOMContentLoaded", () => {
 // --- FUNÇÃO: CARREGAR PERFIL DO USUÁRIO ---
 async function carregarNomeUsuario() {
     const elementoNome = document.getElementById('nome-usuario');
-    if (!elementoNome) return; // Se não tiver header, ignora
+    if (!elementoNome) return; 
 
-    // Tenta pegar o token: PRIORIZA 'authToken', que é a chave correta no seu LocalStorage.
-    const token = localStorage.getItem('authToken') || // Chave corrigida!
+    // Tenta pegar o token (usa a chave correta 'authToken')
+    const token = localStorage.getItem('authToken') || 
                   localStorage.getItem('token') || 
                   localStorage.getItem('jwt'); 
 
     if (!token) {
-        elementoNome.innerText = "Visitante"; // Ou redirecione para login
+        elementoNome.innerText = "Visitante"; // Estado de não logado
         return;
     }
 
@@ -36,17 +36,20 @@ async function carregarNomeUsuario() {
         const response = await fetch(`${BASE_URL}/api/perfis/me`, {
             method: "GET",
             headers: {
-                "Authorization": `Bearer ${token}`,
+                "Authorization": `Bearer ${token}`, // Envia o token
                 "Content-Type": "application/json"
             }
         });
 
         if (response.ok) {
             const usuario = await response.json();
-            // Pega o nome, ou username, ou email (o que tiver disponível)
-            elementoNome.innerText = usuario.nome || usuario.username || "Usuário"; 
+            
+            // CORREÇÃO FINAL: Usa 'nomeCompleto' (chave identificada no JSON de resposta)
+            const nomeExibicao = usuario.nomeCompleto || usuario.username || "Usuário"; 
+            
+            elementoNome.innerText = nomeExibicao; 
         } else {
-            // Token expirado ou inválido (ex: 401 Unauthorized)
+            // Token expirado ou inválido (ex: 401/403)
             console.warn("Sessão inválida. Status:", response.status);
             elementoNome.innerText = "Faça Login";
         }
@@ -58,9 +61,7 @@ async function carregarNomeUsuario() {
 
 // --- FUNÇÃO: ENVIAR FORMULÁRIO ---
 function configurarFormulario(form) {
-    // Atenção: Seu console mostrou erro 403 (Forbidden) no POST /api/contato/enviar
-    // A rota está correta, mas pode ser que o backend exija um token para o POST.
-    const API_URL_CONTATO = `${BASE_URL}/api/contato/enviar`; 
+    const API_URL_CONTATO = `${BASE_URL}/api/contato/enviar`;
 
     form.addEventListener('submit', async function(event) {
         event.preventDefault(); 
@@ -68,7 +69,7 @@ function configurarFormulario(form) {
 
         let hasError = false;
 
-        // Validação básica
+        // --- Validação (Omitida para brevidade, mas deve ser mantida) ---
         const requiredFields = [
             { id: 'nome', msg: 'Este campo é obrigatório.' },
             { id: 'sobrenome', msg: 'Este campo é obrigatório.' },
@@ -79,75 +80,71 @@ function configurarFormulario(form) {
         ];
 
         requiredFields.forEach(field => {
-            const input = document.getElementById(field.id);
-            if (!input) return;
-
-            if (field.id === 'email' && !isValidEmail(input.value)) {
-                showError(input, field.msg);
-                hasError = true;
-            } else if (input.value.trim() === '') {
-                showError(input, field.msg);
-                hasError = true;
-            }
+             const input = document.getElementById(field.id);
+             if (!input) return;
+             if (field.id === 'email' && !isValidEmail(input.value)) {
+                 showError(input, field.msg);
+                 hasError = true;
+             } else if (input.value.trim() === '') {
+                 showError(input, field.msg);
+                 hasError = true;
+             }
         });
+        
+        // Se a validação falhar, para aqui
+        if (hasError) return;
 
-        if (!hasError) {
-            const submitBtn = form.querySelector('button[type="submit"]');
-            const textoOriginal = submitBtn ? submitBtn.textContent : "Enviar";
+        // --- Processamento de Envio ---
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const textoOriginal = submitBtn ? submitBtn.textContent : "Enviar";
 
+        if(submitBtn) {
+            submitBtn.textContent = "Enviando...";
+            submitBtn.disabled = true;
+        }
+
+        const dados = {
+            nome: document.getElementById('nome').value,
+            sobrenome: document.getElementById('sobrenome').value,
+            email: document.getElementById('email').value,
+            telefone: document.getElementById('telefone').value,
+            pais: document.getElementById('pais').value,
+            areaTrabalho: document.getElementById('area').value, // Mapeamento correto
+            motivo: document.getElementById('motivo').value
+        };
+
+        // Adiciona o token ao POST do formulário para evitar 403 (Forbidden), caso seja exigido.
+        const token = localStorage.getItem('authToken');
+        const headers = { "Content-Type": "application/json" };
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+        
+        try {
+            const response = await fetch(API_URL_CONTATO, {
+                method: "POST",
+                headers: headers,
+                body: JSON.stringify(dados)
+            });
+
+            if (response.ok) {
+                window.location.href = 'den-conc.html';
+            } else {
+                alert(`Erro ao enviar. Status: ${response.status}. Tente novamente.`);
+            }
+        } catch (erro) {
+            console.error("Erro de conexão:", erro);
+            alert("Erro de conexão.");
+        } finally {
             if(submitBtn) {
-                submitBtn.textContent = "Enviando...";
-                submitBtn.disabled = true;
-            }
-
-            const dados = {
-                nome: document.getElementById('nome').value,
-                sobrenome: document.getElementById('sobrenome').value,
-                email: document.getElementById('email').value,
-                telefone: document.getElementById('telefone').value,
-                pais: document.getElementById('pais').value,
-                areaTrabalho: document.getElementById('area').value, 
-                motivo: document.getElementById('motivo').value
-            };
-            
-            // Re-busca o token para o envio do formulário, caso o backend exija autenticação
-            const token = localStorage.getItem('authToken');
-            
-            const headers = { "Content-Type": "application/json" };
-            if (token) {
-                // Adiciona o token, caso o backend de contato exija (por causa do erro 403 visto)
-                headers["Authorization"] = `Bearer ${token}`;
-            }
-
-            try {
-                const response = await fetch(API_URL_CONTATO, {
-                    method: "POST",
-                    headers: headers,
-                    body: JSON.stringify(dados)
-                });
-
-                if (response.ok) {
-                    window.location.href = 'den-conc.html';
-                } else {
-                    alert(`Erro ao enviar. Status: ${response.status}. Tente novamente.`);
-                    if(submitBtn) {
-                        submitBtn.textContent = textoOriginal;
-                        submitBtn.disabled = false;
-                    }
-                }
-            } catch (erro) {
-                console.error("Erro de conexão ou rede:", erro);
-                alert("Erro de conexão.");
-                if(submitBtn) {
-                    submitBtn.textContent = textoOriginal;
-                    submitBtn.disabled = false;
-                }
+                submitBtn.textContent = textoOriginal;
+                submitBtn.disabled = false;
             }
         }
     });
 }
 
-// --- AUXILIARES ---
+// --- FUNÇÕES AUXILIARES ---
 function showError(input, message) {
     const formGroup = input.closest('.form-group') || input.parentElement;
     if(formGroup) {

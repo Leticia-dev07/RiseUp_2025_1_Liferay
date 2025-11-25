@@ -163,6 +163,11 @@ RiseUp_2025_1_Liferay/
    - Abra o arquivo `login.html` no navegador
    - **Nota:** Algumas funcionalidades podem não funcionar corretamente devido a restrições CORS
 
+5. Siga as instruções do repositório para implementar o back-end:
+   ```bash
+   https://github.com/Jorgefigueredoo/Back-End-RiseUp-Liferay
+   ```
+
 ### Fluxo de Navegação
 
 1. **Login** (`login.html`) → Digite qualquer usuário/email

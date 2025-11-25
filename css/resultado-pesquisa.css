@@ -1,8 +1,5 @@
-/* Importa a fonte do homepage.css */
-/* O resto do estilo do header e base é herdado do homepage.css */
-
 .results-main-content {
-    max-width: 1200px; /* Mais largo para resultados */
+    max-width: 1200px;
     margin: 40px auto;
     padding: 0 20px;
 }
@@ -15,7 +12,7 @@
 }
 
 .page-title #search-term-display {
-    color: #1327FD; /* Cor de destaque Liferay Blue */
+    color: #1327FD;
 }
 
 .result-category-container {
@@ -37,7 +34,6 @@
     gap: 25px;
 }
 
-/* Estilo para Cards de Perfil (usado para unificar) */
 .profile-card,
 .event-card {
     background: white;
@@ -65,7 +61,6 @@
     color: #555;
 }
 
-/* Estilo para Mensagem de Nenhum Resultado */
 .no-results-message {
     text-align: center;
     padding: 50px;
@@ -80,7 +75,6 @@
     font-weight: 600;
 }
 
-/* Spinner */
 .loading-spinner {
     text-align: center;
     padding: 20px;

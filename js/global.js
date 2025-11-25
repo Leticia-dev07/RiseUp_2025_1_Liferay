@@ -1,15 +1,8 @@
-// ===============================================
-// ARQUIVO: js/global.js (VERSÃO FINAL BLINDADA)
-// ===============================================
-
-// 1. Definições globais
 const API_URL = "https://back-end-riseup-liferay-5.onrender.com/api"; 
 const SERVER_URL = "https://back-end-riseup-liferay-5.onrender.com";
 
-// Tenta pegar o token
 const token = localStorage.getItem("token") || localStorage.getItem("authToken");
 
-// 2. Proteção de Rota
 if (!token) {
     const path = window.location.pathname;
     if (!path.endsWith('login.html') && !path.endsWith('criar-conta.html')) {
@@ -17,9 +10,6 @@ if (!token) {
     }
 }
 
-// =====================
-// CARREGAR DADOS DO CABEÇALHO
-// =====================
 async function carregarDadosUsuario() {
     if (!token) return; 
 
@@ -60,9 +50,6 @@ async function carregarDadosUsuario() {
     }
 }
 
-// =====================
-// CONFIGURAR LOGOUT
-// =====================
 function setupLogout() {
     const logoutButton = document.getElementById("logout-button"); 
     if (logoutButton) {
@@ -75,9 +62,6 @@ function setupLogout() {
     }
 }
 
-// =====================
-// BARRA DE PESQUISA GLOBAL (CORRIGIDA E BLINDADA 🛡️)
-// =====================
 function setupGlobalSearch() {
     const searchInput = document.getElementById("search-input");
     const resultsContainer = document.getElementById("global-search-results");
@@ -89,7 +73,6 @@ function setupGlobalSearch() {
 
     if (!searchInput || !resultsContainer) return;
 
-    // Toggle do Filtro
     if (btnFiltro && dropdownFiltro) {
         btnFiltro.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -147,12 +130,9 @@ function setupGlobalSearch() {
         }
 
         results.forEach(item => {
-            // --- 1. IMAGEM INTELIGENTE ---
-            // Tenta encontrar a imagem em qualquer campo possível
             const rawImg = item.imagemUrl || item.fotoPerfilUrl || item.fotoUrl || item.urlPerfil;
             const rawLink = item.link;
 
-            // Define imagem padrão baseada no tipo
             let imgDefault = "assets/pictures/profile-pic.png";
             if (filtroAtual === 'eventos' || item.descricao === 'Evento') {
                 imgDefault = "assets/pictures/liferay-devcon.jpg"; 
@@ -160,7 +140,6 @@ function setupGlobalSearch() {
 
             let fotoFinal = imgDefault;
 
-            // Validação robusta para identificar se é imagem
             const isImage = (val) => val && typeof val === 'string' && !val.includes(".html") && (val.includes("cloudinary") || val.includes("/fotos/") || val.match(/\.(jpg|jpeg|png|gif)$/i));
 
             let foundImg = null;
@@ -175,18 +154,14 @@ function setupGlobalSearch() {
                 }
             }
 
-            // --- 2. LINK BLINDADO ---
-            // Extrai o ID numérico para montar o link limpo
             let idCru = item.id || item.usuarioId;
             
-            // Se não tiver ID direto, tenta pescar de strings
             if (!idCru) {
                 const textoLink = item.link || item.urlPerfil || "";
                 const match = textoLink.match(/id=(\d+)/) || textoLink.match(/usuarioId=(\d+)/);
                 if (match) idCru = match[1];
             }
 
-            // Remove caracteres não numéricos para evitar URLs sujas
             let idLimpo = idCru ? String(idCru).replace(/\D/g, "") : "";
             let linkDestino = "#";
             
@@ -198,13 +173,11 @@ function setupGlobalSearch() {
                 }
             }
 
-            // --- 3. ESTILOS ---
             let imgRadius = "50%";
             if (filtroAtual === 'eventos' || item.descricao === 'Evento') {
                 imgRadius = "8px"; 
             }
 
-            // --- 4. HTML ---
             const link = document.createElement('a');
             link.href = linkDestino;
             
@@ -214,7 +187,6 @@ function setupGlobalSearch() {
                 color: #333; cursor: pointer; background: #fff; transition: background 0.2s;
             `;
             
-            // Fallback inline para imagem quebrada (onerror)
             link.innerHTML = `
                 <img src="${fotoFinal}" 
                      alt="${item.nome}" 
@@ -251,9 +223,6 @@ function setupGlobalSearch() {
     });
 }
 
-// =====================
-// INICIALIZAÇÃO
-// =====================
 document.addEventListener("DOMContentLoaded", () => {
     carregarDadosUsuario();
     setupLogout();

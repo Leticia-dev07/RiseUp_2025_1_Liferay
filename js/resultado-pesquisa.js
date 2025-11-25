@@ -1,12 +1,7 @@
-// ===============================================
-// URLs do Servidor (Certifique-se de que estão corretas) - ATUALIZADAS PARA O RENDER
-// ===============================================
 const API_URL = "https://back-end-riseup-liferay-5.onrender.com/api"; 
 const SERVER_URL = "https://back-end-riseup-liferay-5.onrender.com"; 
-// ===============================================
 
 document.addEventListener("DOMContentLoaded", () => {
-    // A função setupGlobalSearch do homepage.js garante que a busca funcione nesta página.
     
     const urlParams = new URLSearchParams(window.location.search);
     const searchTerm = urlParams.get('q');
@@ -19,15 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('no-results').style.display = 'block';
     }
 
-    // Garante que o input da busca reflita o termo buscado
     const searchInput = document.getElementById("search-input");
     if (searchInput) searchInput.value = searchTerm || '';
 });
-
-
-// =====================
-// EXECUÇÃO DA BUSCA (Critérios 2, 3, 4, 5)
-// =====================
 
 async function executeSearch(query) {
     const loadingSpinner = document.getElementById('loading-spinner');
@@ -35,15 +24,12 @@ async function executeSearch(query) {
     const eventsContainer = document.getElementById('events-results');
     const noResultsMessage = document.getElementById('no-results');
 
-    // Resetar estado
     profilesContainer.style.display = 'none';
     eventsContainer.style.display = 'none';
     noResultsMessage.style.display = 'none';
     loadingSpinner.style.display = 'block';
 
     try {
-        // Endpoint que assume a busca abrangente (Perfil, Evento, Habilidade)
-        // O backend deve garantir a busca Case-Insensitive (Critério 4) e por palavras-chave (Critério 5)
         const SEARCH_API_URL = `${API_URL}/search?q=${encodeURIComponent(query)}`;
         const token = localStorage.getItem("authToken");
 
@@ -61,8 +47,6 @@ async function executeSearch(query) {
             throw new Error('Falha ao buscar resultados.');
         }
 
-        // Assume que a API retorna um objeto com dois arrays: perfis e eventos
-        // Ex: { profiles: [...], events: [...] }
         const results = await response.json(); 
 
         renderResults(results.profiles || [], results.events || []);
@@ -76,10 +60,6 @@ async function executeSearch(query) {
     }
 }
 
-// =====================
-// RENDERIZAÇÃO DOS RESULTADOS
-// =====================
-
 function renderResults(profiles, events) {
     const profilesList = document.getElementById('profiles-list');
     const eventsList = document.getElementById('events-list');
@@ -89,7 +69,6 @@ function renderResults(profiles, events) {
     profilesList.innerHTML = '';
     eventsList.innerHTML = '';
 
-    // Renderizar Perfis
     if (profiles.length > 0) {
         profiles.forEach(profile => {
             profilesList.innerHTML += createProfileCardHTML(profile);
@@ -98,7 +77,6 @@ function renderResults(profiles, events) {
         profilesContainer.style.display = 'block';
     }
 
-    // Renderizar Eventos
     if (events.length > 0) {
         events.forEach(event => {
             eventsList.innerHTML += createEventCardHTML(event);
@@ -107,14 +85,12 @@ function renderResults(profiles, events) {
         eventsContainer.style.display = 'block';
     }
 
-    // Mostrar mensagem de "Nenhum resultado" (Critério 3)
     if (profiles.length === 0 && events.length === 0) {
         document.getElementById('no-results').style.display = 'block';
     }
 }
 
 function createProfileCardHTML(profile) {
-    // Cria um card básico de perfil para os resultados
     return `
         <a href="perfil.html?id=${profile.id}" class="profile-card">
             <h3>${profile.nome || 'Nome Indisponível'}</h3>
@@ -127,8 +103,6 @@ function createProfileCardHTML(profile) {
 }
 
 function createEventCardHTML(event) {
-    // Cria um card básico de evento para os resultado
-    // Assume que a data vem em formato ISO (YYYY-MM-DD)
     const dataFormatada = new Date(event.data).toLocaleDateString('pt-BR');
     
     return `

@@ -1,10 +1,3 @@
-// ===============================================
-// ARQUIVO: js/perfil.js (CORRIGIDO - SEM DUPLICIDADE)
-// ===============================================
-
-// OBS: As variáveis API_URL, SERVER_URL e token JÁ VÊM do global.js
-// Não precisamos declará-las novamente aqui.
-
 const initialSkills = ["React", "Next.js", "JavaScript", "Python"];
 
 const skillIcons = {
@@ -25,7 +18,6 @@ const skillIcons = {
     sql: '<i class="fas fa-database" style="color:#4479A1;"></i>',
 };
 
-// INICIALIZAÇÃO
 document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
     const publicoUsuarioId = urlParams.get("usuarioId");
@@ -52,7 +44,6 @@ function setupContactButton() {
     }
 }
 
-// --- FUNÇÕES DE INTERFACE ---
 function hideEditorControls() {
     const saveBtn = document.getElementById("save-profile-btn");
     if (saveBtn) saveBtn.style.display = "none";
@@ -92,7 +83,6 @@ function setupEditorControls() {
     }
 }
 
-// --- SISTEMA DE ABAS ---
 function initializeTabs() {
     const tabBtns = document.querySelectorAll(".tab-btn");
     const tabContents = document.querySelectorAll(".tab-content");
@@ -110,7 +100,6 @@ function initializeTabs() {
             const contentEl = document.getElementById(`tab-${targetTab}`);
             if (contentEl) contentEl.classList.add("active");
 
-            // Carrega dados ao clicar na aba
             if (targetTab === "eventos") {
                 carregarEventosInscritos();
             } else if (targetTab === "historico") {
@@ -120,7 +109,6 @@ function initializeTabs() {
     });
 }
 
-// --- FUNÇÕES DE PERFIL ---
 async function carregarMeuPerfilParaEdicao() {
     try {
         const resp = await fetch(`${API_URL}/perfis/me`, { headers: { Authorization: "Bearer " + token } });
@@ -152,7 +140,6 @@ function preencherDadosPerfil(perfil, modoEdicao) {
         document.getElementById("profile-sobre").value = perfil.sobreMim || "";
         renderizarSkills(perfil.habilidades || [], true);
     } else {
-        // Modo visualização
         const elNome = document.getElementById("profile-nome");
         if(elNome) elNome.replaceWith(criarElementoTexto("h1", perfil.nomeCompleto));
         
@@ -160,7 +147,7 @@ function preencherDadosPerfil(perfil, modoEdicao) {
         if(elTitulo) elTitulo.replaceWith(criarElementoTexto("h3", perfil.titulo));
         
         const elSobre = document.getElementById("profile-sobre");
-        if(elSobre) elSobre.replaceWith(criarElementoTexto("p", perfil.sobreMim)); // Corrigido para 'p' para melhor leitura
+        if(elSobre) elSobre.replaceWith(criarElementoTexto("p", perfil.sobreMim));
         
         renderizarSkills(perfil.habilidades || [], false);
     }
@@ -206,7 +193,6 @@ async function uploadMinhaFoto(event) {
     } catch (err) { alert("Erro na foto."); }
 }
 
-// --- SKILLS ---
 function adicionarSkillDaCaixa() {
     const input = document.getElementById("skill-input");
     if (!input.value.trim()) return;
@@ -233,7 +219,6 @@ function getSkillsDaLista() {
     return [...document.querySelectorAll("#skills-list span")].map((s) => s.textContent.trim());
 }
 
-// --- ABA 1: FUTURO ---
 async function carregarEventosInscritos() {
     const loading = document.getElementById("eventos-loading");
     const list = document.getElementById("eventos-list");
@@ -296,7 +281,6 @@ function criarCardEvento(evento, inscricao) {
     return div;
 }
 
-// --- ABA 2: PASSADO ---
 async function carregarHistoricoEventos() {
     const loading = document.getElementById("historico-loading");
     const list = document.getElementById("historico-list");

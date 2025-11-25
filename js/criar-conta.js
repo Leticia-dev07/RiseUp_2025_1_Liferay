@@ -1,17 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
     
-    // Seletores DOM
     const registerForm = document.getElementById("register-form");
     const messageDiv = document.getElementById("message");
     const submitButton = document.getElementById("submit-button");
     
-    // 🎯 URL do Servidor Render
-    const RENDER_BASE_URL = "https://back-end-riseup-liferay-5.onrender.com"; // Variável Auxiliar
-    // const fileInput foi removido
+    const RENDER_BASE_URL = "https://back-end-riseup-liferay-5.onrender.com";
 
-    // setupPhotoPreview() foi removido
-    
-    // Configura o formulário para submissão
     registerForm.addEventListener("submit", async (event) => {
         event.preventDefault();
 
@@ -20,7 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
         submitButton.disabled = true; 
         submitButton.textContent = "Criando conta...";
 
-        // --- 1. COLETA DE TODOS OS DADOS ---
         const nomeUsuario = document.getElementById("nomeUsuario").value;
         const email = document.getElementById("email").value;
         const senha = document.getElementById("senha").value;
@@ -30,7 +23,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const habilidadesString = document.getElementById("habilidades").value; 
         
         
-        // --- 2. PREPARAR O DTO (Apenas JSON) ---
         const registerDto = {
             nomeUsuario: nomeUsuario,
             email: email,
@@ -41,18 +33,15 @@ document.addEventListener("DOMContentLoaded", () => {
             habilidades: habilidadesString.split(',').map(s => s.trim()).filter(s => s.length > 0) 
         };
 
-        // --- 3. FAZER A REQUISIÇÃO (Apenas JSON) ---
         try {
-            // 🌟 URL CORRIGIDA AQUI 🌟
             const response = await fetch(`${RENDER_BASE_URL}/api/auth/register`, {
                 method: "POST",
                 headers: {
-                    'Content-Type': 'application/json' // Definimos o Content-Type como JSON
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(registerDto) // Enviamos o JSON diretamente
+                body: JSON.stringify(registerDto)
             });
 
-            // --- 4. TRATAMENTO DE SUCESSO (COM LOGIN AUTOMÁTICO) ---
             if (response.ok) {
                 const loginData = await response.json(); 
                 
@@ -66,7 +55,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 }, 2000);
 
             } else {
-                // Trata erros do servidor
                 const responseData = await response.text();
                 let errorMessage = "Ocorreu um erro desconhecido no servidor.";
                 

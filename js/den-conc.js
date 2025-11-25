@@ -1,8 +1,3 @@
-// ===============================================
-// ARQUIVO: js/contato.js
-// ===============================================
-
-// Usa a URL global ou define fallback
 const API_BASE_URL = typeof API_URL !== 'undefined' ? API_URL : "https://back-end-riseup-liferay-5.onrender.com/api";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -16,15 +11,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let hasError = false;
 
-        // 1. Coleta dos valores
         const nome = document.getElementById('nome').value.trim();
         const sobrenome = document.getElementById('sobrenome').value.trim();
         const email = document.getElementById('email').value.trim();
         const telefone = document.getElementById('telefone').value.trim();
-        const pais = document.getElementById('pais').value; // Assumindo que é um <select> ou input
-        const area = document.getElementById('area').value.trim(); // Assumindo que é a mensagem ou assunto
+        const pais = document.getElementById('pais').value;
+        const area = document.getElementById('area').value.trim();
 
-        // 2. Validação (Mantendo sua lógica original)
         const requiredFields = [
             { id: 'nome', val: nome, message: 'Este campo é obrigatório.' },
             { id: 'sobrenome', val: sobrenome, message: 'Este campo é obrigatório.' },
@@ -48,9 +41,8 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        if (hasError) return; // Para aqui se tiver erro de validação
+        if (hasError) return;
 
-        // 3. Integração com Back-end
         const submitBtn = form.querySelector('button[type="submit"]');
         const originalText = submitBtn.textContent;
         submitBtn.disabled = true;
@@ -62,25 +54,21 @@ document.addEventListener("DOMContentLoaded", () => {
             email: email,
             telefone: telefone,
             pais: pais,
-            mensagem: area // Mapeando 'area' para 'mensagem' no DTO
+            mensagem: area
         };
 
         try {
-            // Tenta enviar para o endpoint de contato (Você precisa criar este endpoint no Java!)
-            // Se ainda não tiver, vai dar 404, mas serve para testar a conexão.
             const response = await fetch(`${API_BASE_URL}/contato/enviar`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
-                    // Não enviamos Authorization aqui pois contato geralmente é público
                 },
                 body: JSON.stringify(dadosMensagem)
             });
 
             if (response.ok) {
-                // Sucesso!
                 alert("Mensagem enviada com sucesso!");
-                window.location.href = 'ajuda.html'; // Ou página de "Obrigado"
+                window.location.href = 'ajuda.html';
             } else {
                 const erro = await response.json().catch(() => ({}));
                 alert("Erro ao enviar: " + (erro.message || "Tente novamente mais tarde."));
@@ -96,12 +84,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-// Funções Auxiliares (Mantidas do seu código)
 function showError(input, message) {
     const formGroup = input.closest('.form-group') || input.parentElement;
     formGroup.classList.add('error');
     
-    // Tenta achar ou criar span de erro
     let errorMessage = formGroup.querySelector('.error-message');
     if (!errorMessage) {
         errorMessage = document.createElement('span');

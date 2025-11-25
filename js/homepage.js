@@ -4,8 +4,10 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function carregarEventosHome() {
-    const track = document.querySelector('[data-carousel-id="eventos"] .carousel-track');
-    if (!track) return;
+  const track = document.querySelector(
+    '[data-carousel-id="eventos"] .carousel-track'
+  );
+  if (!track) return;
 
     try {
         const response = await fetch(`${API_URL}/eventos`, {
@@ -24,10 +26,11 @@ async function carregarEventosHome() {
         const eventos = await response.json();
         track.innerHTML = "";
 
-        if (eventos.length === 0) {
-            track.innerHTML = '<p style="padding:20px; color:#666;">Nenhum evento encontrado.</p>';
-            return;
-        }
+    if (eventos.length === 0) {
+      track.innerHTML =
+        '<p style="padding:20px; color:#666;">Nenhum evento encontrado.</p>';
+      return;
+    }
 
         eventos.forEach((evento) => {
             const card = document.createElement("div");
@@ -60,8 +63,8 @@ async function carregarEventosHome() {
             card.appendChild(pData);
             card.appendChild(pDesc);
 
-            track.appendChild(card);
-        });
+      track.appendChild(card);
+    });
 
         setupCarousels('[data-carousel-id="eventos"]'); 
 
@@ -72,13 +75,13 @@ async function carregarEventosHome() {
 }
 
 function setupCarousels(selector) {
-    const carousel = document.querySelector(selector);
-    if (!carousel) return;
+  const carousel = document.querySelector(selector);
+  if (!carousel) return;
 
-    const track = carousel.querySelector(".carousel-track");
-    const prevBtn = carousel.querySelector(".carousel-arrow.prev");
-    const nextBtn = carousel.querySelector(".carousel-arrow.next");
-    if (!track || !prevBtn || !nextBtn) return;
+  const track = carousel.querySelector(".carousel-track");
+  const prevBtn = carousel.querySelector(".carousel-arrow.prev");
+  const nextBtn = carousel.querySelector(".carousel-arrow.next");
+  if (!track || !prevBtn || !nextBtn) return;
 
     let index = 0;
     
@@ -93,7 +96,7 @@ function setupCarousels(selector) {
         if (index < 0) index = 0;
         if (index > maxIndex) index = maxIndex;
 
-        track.style.transform = `translateX(-${index * cardWidth}px)`;
+    track.style.transform = `translateX(-${index * cardWidth}px)`;
 
         prevBtn.disabled = index === 0;
         nextBtn.disabled = index >= maxIndex;

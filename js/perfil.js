@@ -5,25 +5,73 @@
 // OBS: As variáveis API_URL, SERVER_URL e token JÁ VÊM do global.js
 // Não precisamos declará-las novamente aqui.
 
-const initialSkills = ["React", "Next.js", "JavaScript", "Python"];
+const initialSkills = ["NIST", "CIS", "Mitre ATT&CK", "OWASP", "XDR", "SIEM", "CTI", "SWG", "NAC", "ITSM"];
 
+// Icones dinâmicos: cada habilidade mapeia para um ícone Font Awesome e cor.
 const skillIcons = {
-    javascript: '<i class="fab fa-js-square" style="color:#f7df1e;"></i>',
-    react: '<i class="fab fa-react" style="color:#61dafb;"></i>',
-    "next.js": '<i class="fa-brands fa-react" style="color:#000;"></i>',
-    python: '<i class="fab fa-python" style="color:#3776ab;"></i>',
-    java: '<i class="fab fa-java" style="color:#f89820;"></i>',
-    html: '<i class="fab fa-html5" style="color:#e34c26;"></i>',
-    css: '<i class="fab fa-css3-alt" style="color:#264de4;"></i>',
-    "node.js": '<i class="fab fa-node-js" style="color:#3c873a;"></i>',
-    git: '<i class="fab fa-git-alt" style="color:#f1502f;"></i>',
-    github: '<i class="fab fa-github"></i>',
-    typescript: '<i class="fab fa-js" style="color:#3178c6;"></i>',
-    "c++": '<i class="fab fa-cuttlefish" style="color:#00599C;"></i>',
-    "c#": '<i class="fas fa-hashtag" style="color:#68217a;"></i>',
-    php: '<i class="fab fa-php" style="color:#777bb3;"></i>',
-    sql: '<i class="fas fa-database" style="color:#4479A1;"></i>',
+    java: { icon: "fas fa-mug-hot", color: "#b45309" },
+    css: { icon: "fab fa-css3-alt", color: "#2563eb" },
+    liferay: { icon: "fas fa-layer-group", color: "#0ea5e9" },
+    git: { icon: "fab fa-git-alt", color: "#ea580c" },
+    scrum: { icon: "fas fa-project-diagram", color: "#7c3aed" },
+    docker: { icon: "fab fa-docker", color: "#0ea5e9" },
+    javascript: { icon: "fab fa-js-square", color: "#f7df1e" },
+    react: { icon: "fab fa-react", color: "#61dafb" },
+    nextjs: { icon: "fas fa-code-branch", color: "#111827" },
+    nodejs: { icon: "fab fa-node-js", color: "#16a34a" },
+    html: { icon: "fab fa-html5", color: "#f97316" },
+    python: { icon: "fab fa-python", color: "#4b8bbe" },
+    php: { icon: "fab fa-php", color: "#6b21a8" },
+    typescript: { icon: "fab fa-js", color: "#2b6cb0" },
+    sql: { icon: "fas fa-database", color: "#4c51bf" },
+    cplusplus: { icon: "fas fa-code", color: "#2563eb" },
+    csharp: { icon: "fas fa-hashtag", color: "#6b21a8" },
+
+    nist: { icon: "fas fa-university", color: "#0f172a" },
+    cis: { icon: "fas fa-shield-alt", color: "#2563eb" },
+    mitreattck: { icon: "fas fa-network-wired", color: "#0ea5e9" },
+    owasp: { icon: "fas fa-bug", color: "#c2410c" },
+    xdr: { icon: "fas fa-wave-square", color: "#14b8a6" },
+    siem: { icon: "fas fa-chart-line", color: "#2563eb" },
+    cti: { icon: "fas fa-user-secret", color: "#1d4ed8" },
+    swg: { icon: "fas fa-globe", color: "#0891b2" },
+    nac: { icon: "fas fa-user-lock", color: "#1f2937" },
+    itsm: { icon: "fas fa-headset", color: "#4c1d95" }
 };
+
+const defaultSkillIcon = { icon: "fas fa-code", color: "#00318f" };
+
+const skillAliasMap = {
+    "c++": "cplusplus",
+    cpp: "cplusplus",
+    "c plus plus": "cplusplus",
+    "c#": "csharp",
+    "c-sharp": "csharp",
+    "c sharp": "csharp",
+    "node.js": "nodejs",
+    "node js": "nodejs",
+    "next.js": "nextjs",
+    "next js": "nextjs",
+    "mitre att&ck": "mitreattck",
+    "mitre attck": "mitreattck"
+};
+
+function normalizeSkillName(name) {
+    if (!name) return "";
+    let normalized = name
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+
+    if (skillAliasMap[normalized]) {
+        return skillAliasMap[normalized];
+    }
+
+    normalized = normalized.replace(/[^a-z0-9]/g, "");
+
+    return skillAliasMap[normalized] || normalized;
+}
 
 // INICIALIZAÇÃO
 document.addEventListener("DOMContentLoaded", () => {
@@ -215,10 +263,17 @@ function adicionarSkillDaCaixa() {
 }
 
 function createSkillElement(skillName, editavel) {
-    const icon = skillIcons[skillName.toLowerCase()] || '<i class="fas fa-code" style="color:#00318f;"></i>';
+    const normalizedSkill = normalizeSkillName(skillName);
+    const iconDef = skillIcons[normalizedSkill] || defaultSkillIcon;
     const div = document.createElement("div");
     div.classList.add("skill-item");
-    div.innerHTML = `<div class="skill-pill">${icon}<span>${skillName}</span>${editavel ? `<button class="delete-skill-btn"><i class="fas fa-times"></i></button>` : ""}</div>`;
+    div.innerHTML = `
+        <div class="skill-tag">
+            <i class="${iconDef.icon}" style="color:${iconDef.color};"></i>
+            <span>${skillName}</span>
+            ${editavel ? `<button class="delete-skill-btn"><i class="fas fa-times"></i></button>` : ""}
+        </div>
+    `;
     return div;
 }
 

@@ -381,41 +381,45 @@ h2, h3 {
 .skills-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 18px;
   margin-top: 30px;
 }
 
 .skill-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
+  display: inline-flex;
 }
 
-.skill-pill {
-  display: flex;
+.skill-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 22px;
+  border: 1px solid #cfd6e5;
+  border-radius: 999px;
+  background-color: var(--cor-branco);
+  color: #1f2a44;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.skill-tag:hover {
+  border-color: #7aa7ff;
+  transform: translateY(-2px);
+}
+
+.skill-tag img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.skill-tag i {
+  font-size: 18px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  background-color: var(--cor-branco);
-  border: 1px solid var(--cor-borda);
-  border-radius: 50px;
-  padding: 12px 24px;
-  font-size: 20px;
-  font-weight: 600;
-  color: #333;
-  min-width: 150px;
-  text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-.skill-pill:hover {
-  transform: translateY(-3px);
-  border-color: var(--cor-principal);
-  box-shadow: 0 6px 14px rgba(0, 49, 143, 0.15);
-  background-color: #f8faff;
-  color: var(--cor-principal);
-  cursor: default;
-  transition: 0.3s;
 }
 
 .delete-skill-btn {

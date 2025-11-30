@@ -36,15 +36,23 @@ async function carregarEventosHome() {
             const card = document.createElement("div");
             card.classList.add("card");
 
+            // --- ALTERAÇÃO: Card Clicável ---
+            // Define o cursor como mãozinha para indicar clique
+            card.style.cursor = "pointer";
+            
+            // Adiciona o evento de clique em todo o card
+            card.onclick = function() {
+                window.location.href = `detalhes-evento.html?id=${evento.id}`;
+            };
+            // --------------------------------
+
             const img = document.createElement("img");
             img.src = "assets/pictures/liferay-devcon.jpg"; 
             img.alt = evento.nome;
 
             const h3 = document.createElement("h3");
-            const link = document.createElement("a");
-            link.href = `detalhes-evento.html?id=${evento.id}`; 
-            link.textContent = evento.nome;
-            h3.appendChild(link);
+            // Apenas o texto do nome, sem link <a> dentro, pois o card todo já é link
+            h3.textContent = evento.nome;
 
             const pData = document.createElement("p");
             pData.style.fontWeight = "bold";

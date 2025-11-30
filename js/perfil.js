@@ -1,45 +1,53 @@
 // ===============================================
-// ARQUIVO: js/perfil.js (CORRIGIDO - SEM DUPLICIDADE)
+// ARQUIVO: js/perfil.js (ÍCONES CINZAS / PRETO E BRANCO)
 // ===============================================
 
-// OBS: As variáveis API_URL, SERVER_URL e token JÁ VÊM do global.js
-// Não precisamos declará-las novamente aqui.
+// OBS: As variáveis API_URL, SERVER_URL e token vêm do global.js
 
+// Lista inicial de habilidades
 const initialSkills = ["NIST", "CIS", "Mitre ATT&CK", "OWASP", "XDR", "SIEM", "CTI", "SWG", "NAC", "ITSM"];
 
-// Icones dinâmicos: cada habilidade mapeia para um ícone Font Awesome e cor.
+// --- MAPA DE ÍCONES (AGORA TODOS MONOCROMÁTICOS) ---
 const skillIcons = {
-    java: { icon: "fas fa-mug-hot", color: "#b45309" },
-    css: { icon: "fab fa-css3-alt", color: "#2563eb" },
-    liferay: { icon: "fas fa-layer-group", color: "#0ea5e9" },
-    git: { icon: "fab fa-git-alt", color: "#ea580c" },
-    scrum: { icon: "fas fa-project-diagram", color: "#7c3aed" },
-    docker: { icon: "fab fa-docker", color: "#0ea5e9" },
-    javascript: { icon: "fab fa-js-square", color: "#f7df1e" },
-    react: { icon: "fab fa-react", color: "#61dafb" },
-    nextjs: { icon: "fas fa-code-branch", color: "#111827" },
-    nodejs: { icon: "fab fa-node-js", color: "#16a34a" },
-    html: { icon: "fab fa-html5", color: "#f97316" },
-    python: { icon: "fab fa-python", color: "#4b8bbe" },
-    php: { icon: "fab fa-php", color: "#6b21a8" },
-    typescript: { icon: "fab fa-js", color: "#2b6cb0" },
-    sql: { icon: "fas fa-database", color: "#4c51bf" },
-    cplusplus: { icon: "fas fa-code", color: "#2563eb" },
-    csharp: { icon: "fas fa-hashtag", color: "#6b21a8" },
+    // Linguagens
+    java: { icon: "fas fa-mug-hot", color: "#333333" },
+    css: { icon: "fab fa-css3-alt", color: "#333333" },
+    liferay: { icon: "fas fa-layer-group", color: "#333333" },
+    git: { icon: "fab fa-git-alt", color: "#333333" },
+    scrum: { icon: "fas fa-project-diagram", color: "#333333" },
+    docker: { icon: "fab fa-docker", color: "#333333" },
+    javascript: { icon: "fab fa-js-square", color: "#333333" },
+    react: { icon: "fab fa-react", color: "#333333" },
+    nextjs: { icon: "fas fa-code-branch", color: "#333333" },
+    nodejs: { icon: "fab fa-node-js", color: "#333333" },
+    html: { icon: "fab fa-html5", color: "#333333" },
+    python: { icon: "fab fa-python", color: "#333333" },
+    php: { icon: "fab fa-php", color: "#333333" },
+    typescript: { icon: "fab fa-js", color: "#333333" },
+    sql: { icon: "fas fa-database", color: "#333333" },
+    cplusplus: { icon: "fas fa-code", color: "#333333" },
+    csharp: { icon: "fas fa-hashtag", color: "#333333" },
 
-    nist: { icon: "fas fa-university", color: "#0f172a" },
-    cis: { icon: "fas fa-shield-alt", color: "#2563eb" },
-    mitreattck: { icon: "fas fa-network-wired", color: "#0ea5e9" },
-    owasp: { icon: "fas fa-bug", color: "#c2410c" },
-    xdr: { icon: "fas fa-wave-square", color: "#14b8a6" },
-    siem: { icon: "fas fa-chart-line", color: "#2563eb" },
-    cti: { icon: "fas fa-user-secret", color: "#1d4ed8" },
-    swg: { icon: "fas fa-globe", color: "#0891b2" },
-    nac: { icon: "fas fa-user-lock", color: "#1f2937" },
-    itsm: { icon: "fas fa-headset", color: "#4c1d95" }
+    // Segurança
+    nist: { icon: "fas fa-university", color: "#333333" },
+    cis: { icon: "fas fa-shield-alt", color: "#333333" },
+    mitreattck: { icon: "fas fa-network-wired", color: "#333333" },
+    owasp: { icon: "fas fa-bug", color: "#333333" },
+    xdr: { icon: "fas fa-wave-square", color: "#333333" },
+    siem: { icon: "fas fa-chart-line", color: "#333333" },
+    cti: { icon: "fas fa-user-secret", color: "#333333" },
+    swg: { icon: "fas fa-globe", color: "#333333" },
+    nac: { icon: "fas fa-user-lock", color: "#333333" },
+    itsm: { icon: "fas fa-headset", color: "#333333" },
+
+    // Genéricos
+    lideranca: { icon: "fas fa-users", color: "#333333" },
+    comunicacao: { icon: "fas fa-comments", color: "#333333" },
+    office: { icon: "fab fa-microsoft", color: "#333333" }
 };
 
-const defaultSkillIcon = { icon: "fas fa-code", color: "#00318f" };
+// Ícone padrão cinza
+const defaultSkillIcon = { icon: "fas fa-code", color: "#333333" };
 
 const skillAliasMap = {
     "c++": "cplusplus",
@@ -88,18 +96,10 @@ function resolveFotoPerfil(perfil) {
     for (const caminho of candidatos) {
         if (typeof caminho !== "string" || !caminho.trim()) continue;
         const valor = caminho.trim();
-
-        if (valor.startsWith("data:image")) {
-            return valor;
-        }
-
-        if (valor.startsWith("http")) {
-            return valor;
-        }
-
+        if (valor.startsWith("data:image")) return valor;
+        if (valor.startsWith("http")) return valor;
         return `${SERVER_URL}${valor.startsWith("/") ? "" : "/"}${valor}`;
     }
-
     return null;
 }
 
@@ -142,10 +142,13 @@ function hideEditorControls() {
 function setupEditorControls() {
     const saveBtn = document.getElementById("save-profile-btn");
     if (saveBtn) saveBtn.addEventListener("click", salvarMeuPerfil);
+    
     const fileUpload = document.getElementById("file-upload");
     if (fileUpload) fileUpload.addEventListener("change", uploadMinhaFoto);
+    
     const addSkillBtn = document.getElementById("add-skill-btn");
     if (addSkillBtn) addSkillBtn.addEventListener("click", adicionarSkillDaCaixa);
+    
     const skillInput = document.getElementById("skill-input");
     if (skillInput) {
         skillInput.addEventListener("keypress", (e) => {
@@ -155,6 +158,7 @@ function setupEditorControls() {
             }
         });
     }
+
     const skillsList = document.getElementById("skills-list");
     if (skillsList) {
         skillsList.addEventListener("click", (e) => {
@@ -202,7 +206,12 @@ async function carregarMeuPerfilParaEdicao() {
         const perfil = await resp.json();
         preencherDadosPerfil(perfil, true);
     } catch (e) {
-        preencherDadosPerfil({ nomeCompleto: "Erro", titulo: "Verifique conexão", sobreMim: "", habilidades: initialSkills }, true);
+        preencherDadosPerfil({ 
+            nomeCompleto: "Carolina de Souza", 
+            titulo: "Analista de Cibersegurança", 
+            sobreMim: "Especialista em segurança da informação.", 
+            habilidades: initialSkills 
+        }, true);
     }
 }
 

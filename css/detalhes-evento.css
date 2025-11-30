@@ -24,7 +24,6 @@ body {
     color: var(--cor-texto-claro);
 }
 
-/* Header */
 .app-header {
     display: flex;
     justify-content: space-between;
@@ -128,7 +127,6 @@ body {
     color: var(--cor-texto-claro);
 }
 
-/* Main */
 .main-content {
     padding: 50px 20px;
     display: flex;
@@ -228,7 +226,6 @@ body {
     transform: translateY(-2px);
 }
 
-/* Estados do botão */
 .btn-inscricao.inscrito { background: var(--cor-sucesso); }
 .btn-inscricao.esgotado { background: var(--cor-aviso); }
 
@@ -242,7 +239,6 @@ body {
 .status-message.warning { color: var(--cor-aviso); }
 .status-message.error { color: var(--cor-notificacao); }
 
-/* Responsivo */
 @media (max-width: 768px) {
     .app-header {
         flex-direction: column;
@@ -259,7 +255,6 @@ body {
     }
 }
 
-/* --- RESULTADOS DA PESQUISA GLOBAL (CORRIGIDO) --- */
 #global-search-results {
   display: none;
   position: absolute;
@@ -364,8 +359,6 @@ REMOVIDO: a::after (Setinha)
     max-height: 350px;
     border-radius: 8px;
   }
-
-  /* REMOVIDO: a::before (Bolinha Azul) do mobile */
 
   #global-search-results a strong {
     font-size: 15px;

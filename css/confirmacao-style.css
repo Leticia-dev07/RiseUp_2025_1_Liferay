@@ -133,7 +133,6 @@ h1 {
     background: #f0f0f0;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .success-card {
         padding: 40px 25px;

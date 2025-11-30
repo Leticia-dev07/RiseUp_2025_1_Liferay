@@ -12,9 +12,6 @@ document.addEventListener("DOMContentLoaded", () => {
     carregarDetalhesEvento(eventoId);
 });
 
-/* =======================================================
-   1) CARREGAR DETALHES DO EVENTO
-======================================================= */
 async function carregarDetalhesEvento(eventoId) {
     try {
         const response = await fetch(`${API_URL}/eventos/${eventoId}`, {
@@ -34,7 +31,6 @@ async function carregarDetalhesEvento(eventoId) {
         eventoAtual = await response.json();
         preencherDetalhesEvento(eventoAtual);
 
-        // AGORA CHAMA O ENDPOINT CERTO
         verificarStatusInscricao(eventoId);
 
     } catch (erro) {
@@ -43,9 +39,6 @@ async function carregarDetalhesEvento(eventoId) {
     }
 }
 
-/* =======================================================
-   2) CHECAR STATUS DA INSCRIÇÃO
-======================================================= */
 async function verificarStatusInscricao(eventoId) {
     try {
         const response = await fetch(`${API_URL}/inscricoes/eventos/${eventoId}/status`, {
@@ -63,9 +56,6 @@ async function verificarStatusInscricao(eventoId) {
     }
 }
 
-/* =======================================================
-   3) INSCREVER NO EVENTO
-======================================================= */
 async function inscreverEvento() {
     const btn = document.getElementById("inscricaoBtn");
     const msg = document.getElementById("statusMessage");
@@ -97,9 +87,6 @@ async function inscreverEvento() {
     }
 }
 
-/* =======================================================
-   4) PREENCHER TELA COM O EVENTO
-======================================================= */
 function preencherDetalhesEvento(evento) {
     document.getElementById("eventName").textContent = evento.nome;
     document.getElementById("eventDescription").textContent = evento.descricao;
@@ -115,14 +102,10 @@ function preencherDetalhesEvento(evento) {
     }
 }
 
-/* =======================================================
-   5) ATUALIZAR BOTÃO
-======================================================= */
 function atualizarBotaoInscricao(status) {
     const btn = document.getElementById("inscricaoBtn");
     const msg = document.getElementById("statusMessage");
 
-    // remove listeners duplicados
     const newBtn = btn.cloneNode(true);
     btn.parentNode.replaceChild(newBtn, btn);
 
@@ -140,7 +123,6 @@ function atualizarBotaoInscricao(status) {
         return;
     }
 
-    // botão normal
     newBtn.querySelector("span").textContent = "Inscrever-se";
     newBtn.disabled = false;
     msg.textContent = "";
@@ -148,9 +130,6 @@ function atualizarBotaoInscricao(status) {
     newBtn.addEventListener("click", inscreverEvento);
 }
 
-/* =======================================================
-   6) CONFIRMAÇÃO
-======================================================= */
 function mostrarConfirmacaoInscricao(evento) {
     localStorage.setItem("inscricaoRealizada", JSON.stringify({
         eventoNome: evento.nome,
@@ -162,9 +141,6 @@ function mostrarConfirmacaoInscricao(evento) {
     window.location.href = "inscricao-confirmacao.html";
 }
 
-/* =======================================================
-   7) UTILITÁRIOS
-======================================================= */
 function formatarData(data) {
     if (!data) return "--/--/----";
     const p = data.split("-");

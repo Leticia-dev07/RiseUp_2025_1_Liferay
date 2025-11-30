@@ -73,6 +73,36 @@ function normalizeSkillName(name) {
     return skillAliasMap[normalized] || normalized;
 }
 
+function resolveFotoPerfil(perfil) {
+    if (!perfil) return null;
+    const candidatos = [
+        perfil.fotoPerfilUrl,
+        perfil.fotoPerfil,
+        perfil.fotoUrl,
+        perfil.imagemUrl,
+        perfil.urlFoto,
+        perfil.urlPerfil,
+        perfil.avatarUrl
+    ];
+
+    for (const caminho of candidatos) {
+        if (typeof caminho !== "string" || !caminho.trim()) continue;
+        const valor = caminho.trim();
+
+        if (valor.startsWith("data:image")) {
+            return valor;
+        }
+
+        if (valor.startsWith("http")) {
+            return valor;
+        }
+
+        return `${SERVER_URL}${valor.startsWith("/") ? "" : "/"}${valor}`;
+    }
+
+    return null;
+}
+
 // INICIALIZAÇÃO
 document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -100,7 +130,6 @@ function setupContactButton() {
     }
 }
 
-// --- FUNÇÕES DE INTERFACE ---
 function hideEditorControls() {
     const saveBtn = document.getElementById("save-profile-btn");
     if (saveBtn) saveBtn.style.display = "none";
@@ -140,7 +169,6 @@ function setupEditorControls() {
     }
 }
 
-// --- SISTEMA DE ABAS ---
 function initializeTabs() {
     const tabBtns = document.querySelectorAll(".tab-btn");
     const tabContents = document.querySelectorAll(".tab-content");
@@ -158,7 +186,6 @@ function initializeTabs() {
             const contentEl = document.getElementById(`tab-${targetTab}`);
             if (contentEl) contentEl.classList.add("active");
 
-            // Carrega dados ao clicar na aba
             if (targetTab === "eventos") {
                 carregarEventosInscritos();
             } else if (targetTab === "historico") {
@@ -168,7 +195,6 @@ function initializeTabs() {
     });
 }
 
-// --- FUNÇÕES DE PERFIL ---
 async function carregarMeuPerfilParaEdicao() {
     try {
         const resp = await fetch(`${API_URL}/perfis/me`, { headers: { Authorization: "Bearer " + token } });
@@ -191,8 +217,13 @@ async function carregarPerfilPublico(usuarioId) {
 
 function preencherDadosPerfil(perfil, modoEdicao) {
     const imgPreview = document.getElementById("main-profile-pic");
-    if (imgPreview && perfil.fotoPerfilUrl) {
-        imgPreview.src = (perfil.fotoPerfilUrl.startsWith("http") ? "" : SERVER_URL) + perfil.fotoPerfilUrl;
+    const fotoFinal = resolveFotoPerfil(perfil) || "assets/pictures/profile-pic.png";
+    if (imgPreview) {
+        imgPreview.src = fotoFinal;
+        imgPreview.onerror = () => {
+            imgPreview.onerror = null;
+            imgPreview.src = "assets/pictures/profile-pic.png";
+        };
     }
     if (modoEdicao) {
         document.getElementById("profile-nome").value = perfil.nomeCompleto || "";
@@ -200,7 +231,6 @@ function preencherDadosPerfil(perfil, modoEdicao) {
         document.getElementById("profile-sobre").value = perfil.sobreMim || "";
         renderizarSkills(perfil.habilidades || [], true);
     } else {
-        // Modo visualização
         const elNome = document.getElementById("profile-nome");
         if(elNome) elNome.replaceWith(criarElementoTexto("h1", perfil.nomeCompleto));
         
@@ -208,7 +238,7 @@ function preencherDadosPerfil(perfil, modoEdicao) {
         if(elTitulo) elTitulo.replaceWith(criarElementoTexto("h3", perfil.titulo));
         
         const elSobre = document.getElementById("profile-sobre");
-        if(elSobre) elSobre.replaceWith(criarElementoTexto("p", perfil.sobreMim)); // Corrigido para 'p' para melhor leitura
+        if(elSobre) elSobre.replaceWith(criarElementoTexto("p", perfil.sobreMim));
         
         renderizarSkills(perfil.habilidades || [], false);
     }
@@ -254,7 +284,6 @@ async function uploadMinhaFoto(event) {
     } catch (err) { alert("Erro na foto."); }
 }
 
-// --- SKILLS ---
 function adicionarSkillDaCaixa() {
     const input = document.getElementById("skill-input");
     if (!input.value.trim()) return;
@@ -288,7 +317,6 @@ function getSkillsDaLista() {
     return [...document.querySelectorAll("#skills-list span")].map((s) => s.textContent.trim());
 }
 
-// --- ABA 1: FUTURO ---
 async function carregarEventosInscritos() {
     const loading = document.getElementById("eventos-loading");
     const list = document.getElementById("eventos-list");
@@ -351,7 +379,6 @@ function criarCardEvento(evento, inscricao) {
     return div;
 }
 
-// --- ABA 2: PASSADO ---
 async function carregarHistoricoEventos() {
     const loading = document.getElementById("historico-loading");
     const list = document.getElementById("historico-list");

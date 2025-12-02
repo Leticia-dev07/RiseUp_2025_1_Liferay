@@ -47,7 +47,7 @@ async function carregarEventosHome() {
             // --------------------------------
 
             const img = document.createElement("img");
-            img.src = "assets/pictures/liferay-devcon.jpg"; 
+            img.src = "assets/pictures/liferay-8.png"; 
             img.alt = evento.nome;
 
             const h3 = document.createElement("h3");

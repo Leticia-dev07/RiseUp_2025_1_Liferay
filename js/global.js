@@ -135,7 +135,7 @@ function setupGlobalSearch() {
 
             let imgDefault = "assets/pictures/profile-pic.png";
             if (filtroAtual === 'eventos' || item.descricao === 'Evento') {
-                imgDefault = "assets/pictures/liferay-devcon.jpg"; 
+                imgDefault = "assets/pictures/liferay-8.png"; 
             }
 
             let fotoFinal = imgDefault;
